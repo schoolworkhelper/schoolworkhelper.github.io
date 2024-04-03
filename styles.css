@@ -1,12 +1,10 @@
 /* Place your CSS styles in this file */
 
 body {
-    background-color: black;
+    background-color: gray;
 }
 
-
 /* headings */
-
 h1 {
     text-align: center;
     font-family: "Consolas", sans-serif;
@@ -26,9 +24,20 @@ h3 {
 	font-size: 200%;
 }
 
+/* authentication form */
+#auth-form {
+    text-align: center;
+    margin-top: 50px; /* adjust the margin as needed */
+}
 
-/* top naviagtion menu
+#auth-form input[type="password"],
+#auth-form button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px; /* add some space between input and button */
+}
 
+/* top navigation menu */
 .topnav {
     background-color: rgb(44, 44, 44);
     overflow: hidden;
@@ -36,69 +45,73 @@ h3 {
     display: table;
     margin: 0 auto;
 }
+
 .topnav a {
-  text-align: center;
-  float: left;
-  color: #ffffff;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
+    text-align: center;
+    float: left;
+    color: #ffffff;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
 }
+
 .topnav a:hover {
-  background-color: #ddd;
-  color: black;
+    background-color: #ddd;
+    color: black;
 }
 
 /* games icons */
-
 .games {
-	background-color: rgb(44, 44, 44);
+    background-color: rgb(44, 44, 44);
     overflow: hidden;
     text-align: center;
     display: table;
     margin-left: auto;
     margin-right: auto;
 }
+
 .games a {
-	text-align: center;
-	float: left;
-	color: #ffffff;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
-	margin-left: auto;
-	margin-right: auto;
+    text-align: center;
+    float: left;
+    color: #ffffff;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 .games a:hover {
-	background-color: #ddd;
-	color: black;
+    background-color: #ddd;
+    color: black;
 }
 
 /* about section */
-
 p {
-	color: #ffffff;
-	background-color: rgb(44, 44, 44);
-	text-align: center;
+    color: #ffffff;
+    background-color: rgb(44, 44, 44);
+    text-align: center;
 }
 
 .contacts {
-	background-color: rgb(44, 44, 44);
+    background-color: rgb(44, 44, 44);
     overflow: hidden;
     text-align: center;
     display: table;
     margin-left: auto;
-	margin-right: auto;
+    margin-right: auto;
 }
+
 .contacts a {
-	text-align: center;
-	float: left;
-	color: #ffffff;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
+    text-align: center;
+    float: left;
+    color: #ffffff;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
 }
+
 .contacts a:hover {
-	background-color: #ddd;
-	color: black;
+    background-color: #ddd;
+    color: black;
 }
