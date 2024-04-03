@@ -79,9 +79,9 @@
     <!-- Load external JavaScript -->
     <script src="scripts.js"></script>
     <script>
-        // Redirect to games.html with parameter 'redirected=true'
-        function redirectToGames() {
-            window.location.href = "games.html?redirected=true";
+        // Check if redirected parameter is not present and redirect to index.html
+        if (!window.location.search.includes('redirected=true')) {
+            window.location.href = "index.html";
         }
     </script>
 </body>
