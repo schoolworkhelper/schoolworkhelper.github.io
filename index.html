@@ -6,6 +6,45 @@
     <link rel="icon" type="x-icon" href="fakeformative.png">
     <!-- Load external CSS styles -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Loading animation styles */
+        @keyframes jump {
+            0%, 20%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        .loading-dots {
+            display: none;
+        }
+        .loading-dots.show {
+            display: block;
+            text-align: center;
+        }
+        .loading-dot {
+            display: inline-block;
+            margin: 0 2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #000;
+            animation: jump 1s infinite ease-in-out;
+        }
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .loading-dot:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+    </style>
 </head>
 <body>
     <center> <img src="favicon.png" width="200" height="200"> </center>
@@ -13,47 +52,49 @@
 
     <!-- Authentication form -->
     <div id="auth-form">
-        <input type="password" id="key-input" placeholder="Enter key">
+        <input type="text" id="key-input" placeholder="Enter key">
         <button onclick="authenticate()">Submit</button>
     </div>
 
-    <p id="error-msg" style="color: red; display: none;">Invalid key. You really thought.</p>
+    <!-- Loading animation -->
+    <div class="loading-dots" id="loading-dots">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+    </div>
 
-    <!-- Load external JavaScript -->
-    <script src="scripts.js"></script>
+    <p id="error-msg" style="color: red; display: none;">Invalid key. Please try again.</p>
+
     <script>
-        // Function to authenticate using KeyAuth
-        function authenticateKeyAuth(key) {
-            const keyAuth = new KeyAuthApp(
-                "Algebra Past Papers", // Application Name
-                "8DC21M410X", // Owner ID
-                "298697a312e8bf6be4b184aa68953323e3c36f2deb0d49d0459e842a2eb29730", // Application Secret
-                "1.0", // Application Version
-            );
-
-            keyAuth.verify(key)
-                .then(response => {
-                    if (response.status === 'success') {
-                        // Key is valid, redirect to games.html with parameter 'redirected=true'
-                        window.location.href = "games.html?redirected=true";
-                    } else {
-                        // Key is invalid, display error message
-                        document.getElementById("error-msg").style.display = "block";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        // Function to handle authentication button click
+        // Function to authenticate using key
         function authenticate() {
-            // Get the entered key
-            var enteredKey = document.getElementById("key-input").value.trim();
-            
-            // Authenticate using KeyAuth
-            authenticateKeyAuth(enteredKey);
+            // Show loading animation
+            document.getElementById("auth-form").style.display = "none";
+            document.getElementById("loading-dots").classList.add("show");
+
+            // Simulate loading for 4 seconds
+            setTimeout(() => {
+                const enteredKey = document.getElementById("key-input").value.trim();
+                const validKeys = [
+                    "unblock-di2OE",
+                    "unblock-kt3Io"
+                ];
+
+                // Check if the entered key is valid
+                if (validKeys.includes(enteredKey)) {
+                    // Key is valid, redirect to games.html
+                    window.location.href = "games.html?redirected=true";
+                } else {
+                    // Key is invalid, display error message
+                    document.getElementById("error-msg").style.display = "block";
+                    // Hide loading animation
+                    document.getElementById("auth-form").style.display = "block";
+                    document.getElementById("loading-dots").classList.remove("show");
+                }
+            }, 4000); // 4 seconds
         }
     </script>
 </body>
 </html>
+
