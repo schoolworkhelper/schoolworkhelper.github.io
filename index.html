@@ -34,8 +34,8 @@
             keyAuth.verify(key)
                 .then(response => {
                     if (response.status === 'success') {
-                        // Key is valid, redirect to games.html
-                        window.location.href = "games.html";
+                        // Key is valid, redirect to games.html with parameter 'redirected=true'
+                        window.location.href = "games.html?redirected=true";
                     } else {
                         // Key is invalid, display error message
                         document.getElementById("error-msg").style.display = "block";
