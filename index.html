@@ -22,22 +22,37 @@
     <!-- Load external JavaScript -->
     <script src="scripts.js"></script>
     <script>
+        // Function to authenticate using KeyAuth
+        function authenticateKeyAuth(key) {
+            const keyAuth = new KeyAuthApp(
+                "Algebra Past Papers", // Application Name
+                "8DC21M410X", // Owner ID
+                "298697a312e8bf6be4b184aa68953323e3c36f2deb0d49d0459e842a2eb29730", // Application Secret
+                "1.0", // Application Version
+            );
+
+            keyAuth.verify(key)
+                .then(response => {
+                    if (response.status === 'success') {
+                        // Key is valid, redirect to games.html
+                        window.location.href = "games.html";
+                    } else {
+                        // Key is invalid, display error message
+                        document.getElementById("error-msg").style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to handle authentication button click
         function authenticate() {
             // Get the entered key
             var enteredKey = document.getElementById("key-input").value.trim();
-            // Define a list of valid keys
-            var validKeys = [
-                "unblock-di2OE",
-                "unblock-kt3Io"
-            ];
-            // Check if the entered key matches any of the valid keys
-            if (validKeys.includes(enteredKey)) {
-                // Key is valid, redirect to games.html
-                window.location.href = "games.html";
-            } else {
-                // Key is invalid, display error message
-                document.getElementById("error-msg").style.display = "block";
-            }
+            
+            // Authenticate using KeyAuth
+            authenticateKeyAuth(enteredKey);
         }
     </script>
 </body>
