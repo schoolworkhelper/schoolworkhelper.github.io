@@ -64,29 +64,51 @@
         <span class="loading-dot"></span>
     </div>
 
-    <p id="error-msg" style="color: red; display: none;">Invalid key. Please try again.</p>
+    <p id="error-msg" style="color: red; display: none;"></p>
 
     <script>
+        // Function to fetch valid keys from keys.json
+        async function fetchValidKeys() {
+            try {
+                const response = await fetch('keys.json');
+                const keysData = await response.json();
+                return keysData.keys;
+            } catch (error) {
+                console.error('Error fetching valid keys:', error);
+                return [];
+            }
+        }
+
         // Function to authenticate using key
-        function authenticate() {
+        async function authenticate() {
             // Show loading animation
             document.getElementById("auth-form").style.display = "none";
             document.getElementById("loading-dots").classList.add("show");
 
             // Simulate loading for 4 seconds
-            setTimeout(() => {
+            setTimeout(async () => {
                 const enteredKey = document.getElementById("key-input").value.trim();
-                const validKeys = [
-                    "unblock-di2OE",
-                    "unblock-kt3Io"
-                ];
+                const validKeys = await fetchValidKeys();
 
                 // Check if the entered key is valid
                 if (validKeys.includes(enteredKey)) {
-                    // Key is valid, redirect to games.html
-                    window.location.href = "games.html?redirected=true";
+                    // Check if the key has been used before
+                    const keyStatus = localStorage.getItem(enteredKey);
+                    if (keyStatus === null) {
+                        // Mark the key as used and redirect
+                        localStorage.setItem(enteredKey, "used");
+                        window.location.href = "games.html?redirected=true";
+                    } else {
+                        // Key has already been used
+                        document.getElementById("error-msg").innerText = "This key has already been used.";
+                        document.getElementById("error-msg").style.display = "block";
+                        // Hide loading animation
+                        document.getElementById("auth-form").style.display = "block";
+                        document.getElementById("loading-dots").classList.remove("show");
+                    }
                 } else {
-                    // Key is invalid, display error message
+                    // Key is invalid
+                    document.getElementById("error-msg").innerText = "Invalid key. Please try again.";
                     document.getElementById("error-msg").style.display = "block";
                     // Hide loading animation
                     document.getElementById("auth-form").style.display = "block";
@@ -97,4 +119,3 @@
     </script>
 </body>
 </html>
-
