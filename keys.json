@@ -1,8 +1,7 @@
 {
   "keys": [
-    "unblock-di2OE",
-    "unblock-kt3Io",
-    "unblock-demo",
-    "catabpt"
+    {"key": "unblock-11111", "user_agent": ""},
+    {"key": "unblock-12345", "user_agent": ""},
+    {"key": "catabpt", "user_agent": ""}
   ]
 }
