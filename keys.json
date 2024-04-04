@@ -1,7 +1,7 @@
 {
-  "keys": [
-    {"key": "unblock-11111", "user_agent": ""},
-    {"key": "unblock-12345", "user_agent": ""},
-    {"key": "catabpt", "user_agent": ""}
+  "keys":[
+    "unblock-1",
+    "unblock-2",
+    "unblock-3"
   ]
 }
