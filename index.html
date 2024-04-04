@@ -99,7 +99,41 @@
                         // Mark the key as used and update user agent
                         localStorage.setItem(enteredKey, "used");
                         keyInfo.user_agent = navigator.userAgent; // Update user agent
-                        window.location.href = "games.html?redirected=true";
+
+                        // Find the keyInfo object in the validKeys array
+                        const keyToUpdate = validKeys.find(key => key.key === enteredKey);
+                        if (keyToUpdate) {
+                            // Update the user_agent property
+                            keyToUpdate.user_agent = navigator.userAgent;
+
+                            // Write the updated validKeys array back to the keys.json file
+                            const updatedKeysData = { keys: validKeys };
+                            fetch('keys.json', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(updatedKeysData)
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to update keys.json');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('keys.json updated successfully');
+                                // Redirect the user
+                                window.location.href = "games.html?redirected=true";
+                            })
+                            .catch(error => {
+                                console.error('Error updating keys.json:', error);
+                                // Handle error
+                            });
+                        } else {
+                            console.error('Key not found in keys.json');
+                            // Handle error
+                        }
                     } else {
                         // Log failed attempt
                         const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
