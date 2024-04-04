@@ -67,103 +67,85 @@
     <p id="error-msg" style="color: red; display: none;"></p>
 
     <script>
-        // Function to fetch valid keys from keys.json
-        async function fetchValidKeys() {
-            try {
-                const response = await fetch('keys.json');
-                const keysData = await response.json();
-                return keysData.keys;
-            } catch (error) {
-                console.error('Error fetching valid keys:', error);
-                return [];
-            }
-        }
-
         // Function to authenticate using key
         async function authenticate() {
             // Show loading animation
             document.getElementById("auth-form").style.display = "none";
             document.getElementById("loading-dots").classList.add("show");
 
-            // Simulate loading for 4 seconds
-            setTimeout(async () => {
-                const enteredKey = document.getElementById("key-input").value.trim();
-                const validKeys = await fetchValidKeys();
+            const enteredKey = document.getElementById("key-input").value.trim();
 
-                // Check if the entered key is valid
-                const keyInfo = validKeys.find(key => key.key === enteredKey);
+            try {
+                const response = await fetch('keys.json');
+                const keysData = await response.json();
+
+                const keyInfo = keysData.keys.find(key => key.key === enteredKey);
+
                 if (keyInfo) {
-                    // Check if the key has been used before and user agent matches
-                    const keyStatus = localStorage.getItem(enteredKey);
-                    if (keyStatus === null || keyInfo.user_agent === "" || keyInfo.user_agent === navigator.userAgent) {
-                        // Mark the key as used and update user agent
-                        localStorage.setItem(enteredKey, "used");
-                        keyInfo.user_agent = navigator.userAgent; // Update user agent
-
-                        // Find the keyInfo object in the validKeys array
-                        const keyToUpdate = validKeys.find(key => key.key === enteredKey);
-                        if (keyToUpdate) {
-                            // Update the user_agent property
-                            keyToUpdate.user_agent = navigator.userAgent;
-
-                            // Write the updated validKeys array back to the keys.json file
-                            const updatedKeysData = { keys: validKeys };
-                            fetch('keys.json', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(updatedKeysData)
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Failed to update keys.json');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                console.log('keys.json updated successfully');
-                                // Redirect the user
-                                window.location.href = "games.html?redirected=true";
-                            })
-                            .catch(error => {
-                                console.error('Error updating keys.json:', error);
-                                // Handle error
-                            });
-                        } else {
-                            console.error('Key not found in keys.json');
-                            // Handle error
-                        }
+                    if (keyInfo.user_agent === "") {
+                        // Allow entry and update user agent
+                        keyInfo.user_agent = navigator.userAgent;
+                        await updateKeysFile(keysData);
+                        redirectUser();
+                    } else if (keyInfo.user_agent === navigator.userAgent) {
+                        // Allow entry if user agent matches
+                        redirectUser();
                     } else {
-                        // Log failed attempt
-                        const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
-                        logs.push({ key: enteredKey, user_agent: navigator.userAgent, status: "failed" });
-                        localStorage.setItem('login_attempts', JSON.stringify(logs));
-                        // Log info to logs.txt
-                        const logText = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
-                        fetch('logs.txt', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'text/plain'
-                            },
-                            body: logText
-                        });
-                        // Key has already been used with a different user agent
-                        document.getElementById("error-msg").innerText = "This key has already been used with a different device.";
-                        document.getElementById("error-msg").style.display = "block";
-                        // Hide loading animation
-                        document.getElementById("auth-form").style.display = "block";
-                        document.getElementById("loading-dots").classList.remove("show");
+                        // Log failed attempt and refuse entry
+                        logAttempt(enteredKey);
+                        displayErrorMessage("This key has already been used with a different device.");
                     }
                 } else {
                     // Key is invalid
-                    document.getElementById("error-msg").innerText = "Invalid key. Please try again.";
-                    document.getElementById("error-msg").style.display = "block";
-                    // Hide loading animation
-                    document.getElementById("auth-form").style.display = "block";
-                    document.getElementById("loading-dots").classList.remove("show");
+                    displayErrorMessage("Invalid key. Please try again.");
                 }
-            }, 4000); // 4 seconds
+            } catch (error) {
+                console.error('Error fetching or parsing keys.json:', error);
+                displayErrorMessage("Error fetching keys. Please try again later.");
+            } finally {
+                // Hide loading animation
+                document.getElementById("auth-form").style.display = "block";
+                document.getElementById("loading-dots").classList.remove("show");
+            }
+        }
+
+        async function updateKeysFile(updatedKeysData) {
+            try {
+                await fetch('keys.json', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedKeysData)
+                });
+            } catch (error) {
+                console.error('Error updating keys.json:', error);
+                // Handle error
+            }
+        }
+
+        function redirectUser() {
+            window.location.href = "games.html?redirected=true";
+        }
+
+        function logAttempt(enteredKey) {
+            const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
+            logs.push({ key: enteredKey, user_agent: navigator.userAgent, status: "failed" });
+            localStorage.setItem('login_attempts', JSON.stringify(logs));
+
+            const logText = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
+            fetch('logs.txt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: logText
+            });
+        }
+
+        function displayErrorMessage(message) {
+            document.getElementById("error-msg").innerText = message;
+            document.getElementById("error-msg").style.display = "block";
         }
     </script>
 </body>
