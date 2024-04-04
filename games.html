@@ -32,6 +32,32 @@
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         }
+
+        /* CSS class for rainbow strobe effect */
+        .rainbow-background {
+            animation: rainbow 0.5s infinite;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-color: red;
+            }
+            20% {
+                background-color: orange;
+            }
+            40% {
+                background-color: yellow;
+            }
+            60% {
+                background-color: green;
+            }
+            80% {
+                background-color: blue;
+            }
+            100% {
+                background-color: purple;
+            }
+        }
     </style>
 </head>
 <body>
@@ -58,23 +84,7 @@
                 <a class="gamebutton" href="twenT48/index.html"><img src="twenT48/icon.png"></a>
                 <a class="gamebutton" href="hxtrs/index.html"><img src="hxtrs/icon.png"></a>
                 <a class="gamebutton" href="rdsrd/index.html"><img src="rdsrd/icon.png"></a>
-                <a class="gamebutton" href="emjmnswp/index.html"><img src="emjmnswp/icon.png"></a>
-                <a class="gamebutton" href="infmar/main.html"><img src="infmar/icon.png"></a>
-                <a class="gamebutton" href="twdf/index.html"><img src="twdf/icon.png"></a>
-                <a class="gamebutton" href="typr/typr.html"><img src="typr/icon.png"></a>
-                <a class="gamebutton" href="f1/index.html"><img src="f1/icon.png"></a>
-                <a class="gamebutton" href="wlfjs/index.html"><img src="wlfjs/icon.png"></a>
-                <a class="gamebutton" href="gtwyshtut/index.html"><img src="gtwyshtut/icon.png"></a>
-                <a class="gamebutton" href="tptptp/index.html"><img src="tptptp/icon.png"></a>
-                <a class="gamebutton" href="stckmnhk/index.html"><img src="stckmnhk/icon.jpg"></a>
-                <a class="gamebutton" href="flpybrd/index.html"><img src="flpybrd/icon.png"></a>
-                <a class="gamebutton" href="chrdno/index.html"><img src="chrdno/icon.png"></a>
-                <a class="gamebutton" href="stck/index.html"><img src="stck/icon.png"></a>
-                <a class="gamebutton" href="wdl/index.html"><img src="wdl/icon.png"></a>
-                <a class="gamebutton" href="cc/index.html"><img src="cc/icon.png"></a>
-                <a class="gamebutton" href="rlyvtx/index.html"><img src="rlyvtx/icon.png"></a>
-                <a class="gamebutton" href="tnyfsh/index.html"><img src="tnyfsh/icon.png"></a>
-                <a class="gamebutton" href="egycr/index.html"><img src="egycr/icon.png"></a>
+                <!-- Add more game buttons as needed -->
             </div>
         </section>
 
@@ -85,16 +95,13 @@
                 <a class="gamebutton" href="subsurf/subsurfs.html"><img src="subsurf/icon.png"></a>
                 <a class="gamebutton" href="dm/index.html"><img src="dm/icon.png"></a>
                 <a class="gamebutton" href="crsyrd/index.html"><img src="crsyrd/icon.png"></a>
-                <a class="gamebutton" href="cbfld/index.html"><img src="cbfld/icon.jpg"></a>
-                <a class="gamebutton" href="rtbwl/index.html"><img src="rtbwl/icon.png"></a>
-                <a class="gamebutton" href="trts/index.html"><img src="trts/icon.png"></a>
-                <a class="gamebutton" href="chtwntftet/couch/index.html"><img src="chtwntftet/icon.jpg"></a>
+                <!-- Add more game buttons as needed -->
             </div>
         </section>
 
         <section class="privacy-section">
             <h1>Privacy first</h1>
-            <img src="lock.png" alt="Lock Icon" style="display: block; margin: 0 auto;">
+            <img src="lock.png" alt="Lock Icon" style="display: block; margin: 0 auto; cursor: pointer;" id="lockIcon">
             <p>Anonymity<br>We are the best homework tool, it is not possible to be detected by using our service. The only thing we collect about you is your User Agent to stop people from sharing keys. Your User Agent looks something like this: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36. As you can see, it's not very identifiable, leaving you no reason to be worried.
             <br><br>Why choose us?<br>We are contactable if an assignment is blocked or not working.</p>
         </section>
@@ -110,10 +117,13 @@
     <!-- External JavaScript -->
     <script src="scripts.js"></script>
     <script>
-        // Redirect if the 'redirected' parameter is not present
-        if (!window.location.search.includes('redirected=true')) {
-            window.location.href = "index.html";
+        // Function to toggle rainbow background effect
+        function toggleRainbowBackground() {
+            document.body.classList.toggle('rainbow-background');
         }
+
+        // Add click event listener to lock icon
+        document.getElementById('lockIcon').addEventListener('click', toggleRainbowBackground);
     </script>
 </body>
 </html>
