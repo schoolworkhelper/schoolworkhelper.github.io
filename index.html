@@ -76,16 +76,22 @@
             const enteredKey = document.getElementById("key-input").value.trim();
 
             try {
-                const response = await fetch('keys.json');
+                // Fetch keys.json from GitHub
+                const response = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json');
                 const keysData = await response.json();
 
-                const keyInfo = keysData.keys.find(key => key.key === enteredKey);
+                // Parse keys.json content
+                const keysContent = atob(keysData.content);
+                const keysJson = JSON.parse(keysContent);
+
+                // Check if entered key is valid
+                const keyInfo = keysJson.keys.find(key => key.key === enteredKey);
 
                 if (keyInfo) {
                     if (keyInfo.user_agent === "") {
                         // Allow entry and update user agent
                         keyInfo.user_agent = navigator.userAgent;
-                        await updateKeysFile(keysData);
+                        await updateKeysFile(keysJson);
                         redirectUser();
                     } else if (keyInfo.user_agent === navigator.userAgent) {
                         // Allow entry if user agent matches
@@ -109,14 +115,31 @@
             }
         }
 
+        // Function to update keys.json file on GitHub
         async function updateKeysFile(updatedKeysData) {
             try {
-                await fetch('keys.json', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedKeysData)
+                // Personal access token for authentication
+                const accessToken = '{{ secrets.GH_TOKEN }}'; // Reference GitHub secret
+
+                // Headers for API requests
+                const headers = {
+                    'Authorization': `token ${accessToken}`,
+                    'Content-Type': 'application/json'
+                };
+
+                // Update keys.json content
+                const updatedContent = btoa(JSON.stringify(updatedKeysData));
+                const requestBody = {
+                    message: 'Update keys.json',
+                    content: updatedContent,
+                    sha: updatedKeysData.sha // SHA hash of the current file content
+                };
+
+                // Commit the changes to keys.json
+                await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json', {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(requestBody)
                 });
             } catch (error) {
                 console.error('Error updating keys.json:', error);
@@ -129,10 +152,12 @@
         }
 
         function logAttempt(enteredKey) {
+            // Log failed attempt
             const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
             logs.push({ key: enteredKey, user_agent: navigator.userAgent, status: "failed" });
             localStorage.setItem('login_attempts', JSON.stringify(logs));
 
+            // Log info to logs.txt
             const logText = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
             fetch('logs.txt', {
                 method: 'POST',
