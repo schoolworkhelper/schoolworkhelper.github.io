@@ -91,16 +91,31 @@
                 const validKeys = await fetchValidKeys();
 
                 // Check if the entered key is valid
-                if (validKeys.includes(enteredKey)) {
-                    // Check if the key has been used before
+                const keyInfo = validKeys.find(key => key.key === enteredKey);
+                if (keyInfo) {
+                    // Check if the key has been used before and user agent matches
                     const keyStatus = localStorage.getItem(enteredKey);
-                    if (keyStatus === null) {
-                        // Mark the key as used and redirect
+                    if (keyStatus === null || keyInfo.user_agent === "" || keyInfo.user_agent === navigator.userAgent) {
+                        // Mark the key as used and update user agent
                         localStorage.setItem(enteredKey, "used");
+                        keyInfo.user_agent = navigator.userAgent; // Update user agent
                         window.location.href = "games.html?redirected=true";
                     } else {
-                        // Key has already been used
-                        document.getElementById("error-msg").innerText = "This key has already been used.";
+                        // Log failed attempt
+                        const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
+                        logs.push({ key: enteredKey, user_agent: navigator.userAgent, status: "failed" });
+                        localStorage.setItem('login_attempts', JSON.stringify(logs));
+                        // Log info to logs.txt
+                        const logText = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
+                        fetch('logs.txt', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'text/plain'
+                            },
+                            body: logText
+                        });
+                        // Key has already been used with a different user agent
+                        document.getElementById("error-msg").innerText = "This key has already been used with a different device.";
                         document.getElementById("error-msg").style.display = "block";
                         // Hide loading animation
                         document.getElementById("auth-form").style.display = "block";
