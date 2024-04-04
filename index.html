@@ -67,7 +67,6 @@
     <p id="error-msg" style="color: red; display: none;"></p>
 
     <script>
-        // Function to authenticate using key
         async function authenticate() {
             // Show loading animation
             document.getElementById("auth-form").style.display = "none";
@@ -77,12 +76,15 @@
 
             try {
                 // Fetch keys.json from GitHub
-                const response = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json');
-                const keysData = await response.json();
-
-                // Parse keys.json content
+                const responseKeys = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json');
+                const keysData = await responseKeys.json();
                 const keysContent = atob(keysData.content);
                 const keysJson = JSON.parse(keysContent);
+
+                // Fetch logs.txt from GitHub
+                const responseLogs = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/logs.txt');
+                const logsData = await responseLogs.json();
+                const logsContent = atob(logsData.content);
 
                 // Check if entered key is valid
                 const keyInfo = keysJson.keys.find(key => key.key === enteredKey);
@@ -91,7 +93,7 @@
                     if (keyInfo.user_agent === "") {
                         // Allow entry and update user agent
                         keyInfo.user_agent = navigator.userAgent;
-                        await updateKeysFile(keysJson);
+                        await updateFile('keys.json', keysData.sha, JSON.stringify(keysJson));
                         redirectUser();
                     } else if (keyInfo.user_agent === navigator.userAgent) {
                         // Allow entry if user agent matches
@@ -106,8 +108,8 @@
                     displayErrorMessage("Invalid key. Please try again.");
                 }
             } catch (error) {
-                console.error('Error fetching or parsing keys.json:', error);
-                displayErrorMessage("Error fetching keys. Please try again later.");
+                console.error('Error:', error);
+                displayErrorMessage("Error fetching data. Please try again later.");
             } finally {
                 // Hide loading animation
                 document.getElementById("auth-form").style.display = "block";
@@ -115,8 +117,7 @@
             }
         }
 
-        // Function to update keys.json file on GitHub
-        async function updateKeysFile(updatedKeysData) {
+        async function updateFile(filename, sha, content) {
             try {
                 // Personal access token for authentication
                 const accessToken = '{{ secrets.GH_TOKEN }}'; // Reference GitHub secret
@@ -127,22 +128,22 @@
                     'Content-Type': 'application/json'
                 };
 
-                // Update keys.json content
-                const updatedContent = btoa(JSON.stringify(updatedKeysData));
+                // Update file content
+                const updatedContent = btoa(content);
                 const requestBody = {
-                    message: 'Update keys.json',
+                    message: `Update ${filename}`,
                     content: updatedContent,
-                    sha: updatedKeysData.sha // SHA hash of the current file content
+                    sha: sha
                 };
 
-                // Commit the changes to keys.json
-                await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json', {
+                // Commit the changes
+                await fetch(`https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/${filename}`, {
                     method: 'PUT',
                     headers: headers,
                     body: JSON.stringify(requestBody)
                 });
             } catch (error) {
-                console.error('Error updating keys.json:', error);
+                console.error('Error updating file:', error);
                 // Handle error
             }
         }
@@ -153,19 +154,8 @@
 
         function logAttempt(enteredKey) {
             // Log failed attempt
-            const logs = JSON.parse(localStorage.getItem('login_attempts')) || [];
-            logs.push({ key: enteredKey, user_agent: navigator.userAgent, status: "failed" });
-            localStorage.setItem('login_attempts', JSON.stringify(logs));
-
-            // Log info to logs.txt
-            const logText = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
-            fetch('logs.txt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: logText
-            });
+            const logsContent = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
+            updateFile('logs.txt', logsData.sha, logsContent);
         }
 
         function displayErrorMessage(message) {
