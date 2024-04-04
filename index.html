@@ -67,100 +67,54 @@
     <p id="error-msg" style="color: red; display: none;"></p>
 
     <script>
+        // Function to fetch valid keys from keys.json
+        async function fetchValidKeys() {
+            try {
+                const response = await fetch('keys.json');
+                const keysData = await response.json();
+                return keysData.keys;
+            } catch (error) {
+                console.error('Error fetching valid keys:', error);
+                return [];
+            }
+        }
+
+        // Function to authenticate using key
         async function authenticate() {
             // Show loading animation
             document.getElementById("auth-form").style.display = "none";
             document.getElementById("loading-dots").classList.add("show");
 
-            const enteredKey = document.getElementById("key-input").value.trim();
+            // Simulate loading for 4 seconds
+            setTimeout(async () => {
+                const enteredKey = document.getElementById("key-input").value.trim();
+                const validKeys = await fetchValidKeys();
 
-            try {
-                // Fetch keys.json from GitHub
-                const responseKeys = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/keys.json');
-                const keysData = await responseKeys.json();
-                const keysContent = atob(keysData.content);
-                const keysJson = JSON.parse(keysContent);
-
-                // Fetch logs.txt from GitHub
-                const responseLogs = await fetch('https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/logs.txt');
-                const logsData = await responseLogs.json();
-                const logsContent = atob(logsData.content);
-
-                // Check if entered key is valid
-                const keyInfo = keysJson.keys.find(key => key.key === enteredKey);
-
-                if (keyInfo) {
-                    if (keyInfo.user_agent === "") {
-                        // Allow entry and update user agent
-                        keyInfo.user_agent = navigator.userAgent;
-                        await updateFile('keys.json', keysData.sha, JSON.stringify(keysJson));
-                        redirectUser();
-                    } else if (keyInfo.user_agent === navigator.userAgent) {
-                        // Allow entry if user agent matches
-                        redirectUser();
+                // Check if the entered key is valid
+                if (validKeys.includes(enteredKey)) {
+                    // Check if the key has been used before
+                    const keyStatus = localStorage.getItem(enteredKey);
+                    if (keyStatus === null) {
+                        // Mark the key as used and redirect
+                        localStorage.setItem(enteredKey, "used");
+                        window.location.href = "games.html?redirected=true";
                     } else {
-                        // Log failed attempt and refuse entry
-                        logAttempt(enteredKey);
-                        displayErrorMessage("This key has already been used with a different device.");
+                        // Key has already been used
+                        document.getElementById("error-msg").innerText = "This key has already been used.";
+                        document.getElementById("error-msg").style.display = "block";
+                        // Hide loading animation
+                        document.getElementById("auth-form").style.display = "block";
+                        document.getElementById("loading-dots").classList.remove("show");
                     }
                 } else {
                     // Key is invalid
-                    displayErrorMessage("Invalid key. Please try again.");
+                    document.getElementById("error-msg").innerText = "Invalid key. Please try again.";
+                    document.getElementById("error-msg").style.display = "block";
+                    // Hide loading animation
+                    document.getElementById("auth-form").style.display = "block";
+                    document.getElementById("loading-dots").classList.remove("show");
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                displayErrorMessage("Error fetching data. Please try again later.");
-            } finally {
-                // Hide loading animation
-                document.getElementById("auth-form").style.display = "block";
-                document.getElementById("loading-dots").classList.remove("show");
-            }
-        }
-
-        async function updateFile(filename, sha, content) {
-            try {
-                // Personal access token for authentication
-                const accessToken = '{{ secrets.GH_TOKEN }}'; // Reference GitHub secret
-
-                // Headers for API requests
-                const headers = {
-                    'Authorization': `token ${accessToken}`,
-                    'Content-Type': 'application/json'
-                };
-
-                // Update file content
-                const updatedContent = btoa(content);
-                const requestBody = {
-                    message: `Update ${filename}`,
-                    content: updatedContent,
-                    sha: sha
-                };
-
-                // Commit the changes
-                await fetch(`https://api.github.com/repos/schoolworkhelper/schoolworkhelper.github.io/contents/${filename}`, {
-                    method: 'PUT',
-                    headers: headers,
-                    body: JSON.stringify(requestBody)
-                });
-            } catch (error) {
-                console.error('Error updating file:', error);
-                // Handle error
-            }
-        }
-
-        function redirectUser() {
-            window.location.href = "games.html?redirected=true";
-        }
-
-        function logAttempt(enteredKey) {
-            // Log failed attempt
-            const logsContent = `Key '${enteredKey}' has been attempted on a different device with user agent: ${navigator.userAgent}\n`;
-            updateFile('logs.txt', logsData.sha, logsContent);
-        }
-
-        function displayErrorMessage(message) {
-            document.getElementById("error-msg").innerText = message;
-            document.getElementById("error-msg").style.display = "block";
+            }, 4000); // 4 seconds
         }
     </script>
 </body>
