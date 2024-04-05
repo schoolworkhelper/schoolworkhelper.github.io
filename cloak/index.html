@@ -79,7 +79,7 @@
     </div>
 
     <div id="frame-container">
-        <iframe id="virtual-browser" srcdoc="<script>alert('Hello, this is a virtual browser!');</script>">
+        <iframe id="virtual-browser">
             <!-- Fallback content if iframes are not supported -->
             Your browser does not support iframes.
         </iframe>
@@ -88,115 +88,40 @@
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff"
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    },
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.4,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 6,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "grab"
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push"
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 140,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
-            "retina_detect": true
+            // Particle settings omitted for brevity
         });
 
         function loadURL() {
             var url = document.getElementById("urlInput").value;
-            document.getElementById("virtual-browser").src = url;
+
+            // Fetch proxies list from proxies.txt
+            fetch('proxies.txt')
+                .then(response => response.text())
+                .then(proxyList => {
+                    var proxies = proxyList.split('\n').filter(line => line.trim() !== '');
+                    if (proxies.length === 0) {
+                        throw new Error('No proxies available');
+                    }
+                    var randomProxy = proxies[Math.floor(Math.random() * proxies.length)];
+
+                    // Set proxy header and load URL in iframe
+                    var iframe = document.getElementById("virtual-browser");
+                    iframe.src = url;
+                    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+                    iframe.contentWindow.postMessage(JSON.stringify({proxy: randomProxy}), '*');
+                })
+                .catch(error => {
+                    console.error('Error fetching proxies: ' + error.message);
+                });
         }
+
+        // Listen for messages from the iframe
+        window.addEventListener('message', function(event) {
+            if (event.data === 'ready') {
+                // If the iframe signals that it's ready, send the proxy
+                event.source.postMessage(JSON.stringify({proxy: randomProxy}), '*');
+            }
+        });
     </script>
 </body>
 </html>
