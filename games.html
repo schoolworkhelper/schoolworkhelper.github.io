@@ -146,11 +146,11 @@
         document.getElementById('lockIcon').addEventListener('click', toggleRainbowBackground);
 
         // Function to handle Alt + Shift key press
-        function handleKeyPress(event) {
-            if (event.altKey && event.shiftKey && event.key === "Tab") {
-                window.location.href = "https://www.google.com";
-            }
+    function handleKeyPress(event) {
+        if (event.altKey && event.shiftKey && event.keyCode === 9) {
+            window.location.href = "https://www.google.com";
         }
+    }
 
         // Add keydown event listener to document
         document.addEventListener('keydown', handleKeyPress);
