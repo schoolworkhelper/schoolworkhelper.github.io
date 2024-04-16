@@ -95,8 +95,6 @@
                     // Check if the key has been used before
                     const keyStatus = localStorage.getItem(enteredKey);
                     if (keyStatus === null) {
-                        // Mark the key as used and redirect
-                        localStorage.setItem(enteredKey, "used");
                         window.location.href = "games.html?redirected=true";
                     } else {
                         // Key has already been used
