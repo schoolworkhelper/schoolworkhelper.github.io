@@ -36,19 +36,19 @@
             animation: jump 1s infinite ease-in-out;
         }
         .loading-dot:nth-child(2) {
-            animation-delay: 0.1s;
+            animation-delay: 0.15s;
         }
         .loading-dot:nth-child(3) {
-            animation-delay: 0.2s;
+            animation-delay: 0.25s;
         }
         .loading-dot:nth-child(4) {
-            animation-delay: 0.3s;
+            animation-delay: 0.35s;
         }
     </style>
 </head>
 <body>
     <center> <img src="favicon.png" width="200" height="200"> </center>
-    <h3>-~- Maths, Science, History, English, Geography, French, Latin, Spanish and more!-~-</h3>
+    <h3>-~- GCSE Help, Maths, Science, History, English, Geography, French, Latin, Spanish and more!-~-</h3>
 
     <!-- Authentication form -->
     <div id="auth-form">
@@ -85,7 +85,7 @@
             document.getElementById("auth-form").style.display = "none";
             document.getElementById("loading-dots").classList.add("show");
 
-            // Simulate loading for 4 seconds
+            // Simulate loading for 3 seconds
             setTimeout(async () => {
                 const enteredKey = document.getElementById("key-input").value.trim();
                 const validKeys = await fetchValidKeys();
@@ -106,13 +106,13 @@
                     }
                 } else {
                     // Key is invalid
-                    document.getElementById("error-msg").innerText = "Invalid key. Please try again.";
+                    document.getElementById("error-msg").innerText = "Invalid key. Are you even sigma?.";
                     document.getElementById("error-msg").style.display = "block";
                     // Hide loading animation
                     document.getElementById("auth-form").style.display = "block";
                     document.getElementById("loading-dots").classList.remove("show");
                 }
-            }, 4000); // 4 seconds
+            }, 3000); // 3 seconds
         }
     </script>
 </body>
