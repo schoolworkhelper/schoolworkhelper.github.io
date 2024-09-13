@@ -7,7 +7,7 @@
     <!-- Load external CSS styles -->
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Loading animation styles */
+        /* Include the updated CSS styles here */
         @keyframes jump {
             0%, 20%, 80%, 100% {
                 transform: translateY(0);
@@ -43,6 +43,10 @@
         }
         .loading-dot:nth-child(4) {
             animation-delay: 0.35s;
+        }
+        .loading-dots.gold .loading-dot {
+            background-color: gold;
+            box-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
         }
     </style>
 </head>
@@ -83,7 +87,8 @@
         async function authenticate() {
             // Show loading animation
             document.getElementById("auth-form").style.display = "none";
-            document.getElementById("loading-dots").classList.add("show");
+            const loadingDots = document.getElementById("loading-dots");
+            loadingDots.classList.add("show");
 
             // Simulate loading for 3 seconds
             setTimeout(async () => {
@@ -91,7 +96,11 @@
                 const validKeys = await fetchValidKeys();
 
                 // Check if the entered key is valid
-                if (validKeys.includes(enteredKey)) {
+                if (enteredKey === "banananesquik") {
+                    // Redirect to premium.html and apply golden dots
+                    window.location.href = "premium.html";
+                    loadingDots.classList.add("gold");
+                } else if (validKeys.includes(enteredKey)) {
                     // Check if the key has been used before
                     const keyStatus = localStorage.getItem(enteredKey);
                     if (keyStatus === null) {
@@ -102,7 +111,7 @@
                         document.getElementById("error-msg").style.display = "block";
                         // Hide loading animation
                         document.getElementById("auth-form").style.display = "block";
-                        document.getElementById("loading-dots").classList.remove("show");
+                        loadingDots.classList.remove("show");
                     }
                 } else {
                     // Key is invalid
@@ -110,7 +119,7 @@
                     document.getElementById("error-msg").style.display = "block";
                     // Hide loading animation
                     document.getElementById("auth-form").style.display = "block";
-                    document.getElementById("loading-dots").classList.remove("show");
+                    loadingDots.classList.remove("show");
                 }
             }, 3000); // 3 seconds
         }
