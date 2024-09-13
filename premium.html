@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to the VLE</title>
+    <link rel="icon" type="image/png" href="fakeformative.png">
+    <!-- External CSS styles -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom styles for rounded buttons and task hover effect */
+        .button {
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #FFD700;
+        }
+
+        .gamebutton {
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .gamebutton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        /* CSS class for rainbow strobe effect */
+        .rainbow-background {
+            animation: rainbow 0.5s infinite;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-color: red;
+            }
+            20% {
+                background-color: orange;
+            }
+            40% {
+                background-color: yellow;
+            }
+            60% {
+                background-color: green;
+            }
+            80% {
+                background-color: blue;
+            }
+            100% {
+                background-color: purple;
+            }
+        }
+
+        /* Background color */
+        body {
+            background-color: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <center> <img src="favicon.png" alt="VLE Logo" width="200" height="200"> </center>
+        <h3>-~- Premium Non-Smoothwall Homework -~-</h3>
+    </header>
+
+    <main>
+        <section class="login-section">
+            <center>
+                <input type="text" name="username" class="input navbar-control" placeholder="Enter fake title" value="Formative" id="title">
+                <input type="text" name="password" class="input navbar-control" placeholder="fakeformative.png" value="fakeformative.png" id="icon">
+                <br>
+                <button class="button navbar-control" type="button" id="btnTitle">Set title</button>
+                <button class="button navbar-control" type="button" id="btnIcon">Set Icon</button>
+                <button class="button navbar-control" type="button" id="btnReset">Reset</button>
+            </center>
+        </section>
+
+        <section class="homework-section">
+            <h1>Homework Tasks (20)</h1>
+            <div class="games">
+                <a class="gamebutton" href="twenT48/index.html"><img src="twenT48/icon.png"></a>
+                <a class="gamebutton" href="hxtrs/index.html"><img src="hxtrs/icon.png"></a>
+                <a class="gamebutton" href="rdsrd/index.html"><img src="rdsrd/icon.png"></a>
+                <a class="gamebutton" href="emjmnswp/index.html"><img src="emjmnswp/icon.png"></a>
+                <a class="gamebutton" href="infmar/main.html"><img src="infmar/icon.png"></a>
+                <a class="gamebutton" href="twdf/index.html"><img src="twdf/icon.png"></a>
+                <a class="gamebutton" href="typr/typr.html"><img src="typr/icon.png"></a>
+                <a class="gamebutton" href="f1/index.html"><img src="f1/icon.png"></a>
+                <a class="gamebutton" href="wlfjs/index.html"><img src="wlfjs/icon.png"></a>
+                <a class="gamebutton" href="gtwyshtut/index.html"><img src="gtwyshtut/icon.png"></a>
+                <a class="gamebutton" href="tptptp/index.html"><img src="tptptp/icon.png"></a>
+                <a class="gamebutton" href="stckmnhk/index.html"><img src="stckmnhk/icon.jpg"></a>
+                <a class="gamebutton" href="flpybrd/index.html"><img src="flpybrd/icon.png"></a>
+                <a class="gamebutton" href="chrdno/index.html"><img src="chrdno/icon.png"></a>
+                <a class="gamebutton" href="stck/index.html"><img src="stck/icon.png"></a>
+                <a class="gamebutton" href="wdl/index.html"><img src="wdl/icon.png"></a>
+                <a class="gamebutton" href="cc/index.html"><img src="cc/icon.png"></a>
+                <a class="gamebutton" href="rlyvtx/index.html"><img src="rlyvtx/icon.png"></a>
+                <a class="gamebutton" href="tnyfsh/index.html"><img src="tnyfsh/icon.png"></a>
+                <a class="gamebutton" href="egycr/index.html"><img src="egycr/icon.png"></a>
+            </div>
+        </section>
+
+        <section class="due-tasks-section">
+            <h1>Due Tasks (7)</h1>
+            <p>These homework tools may or may not work as intended!</p>
+            <div class="games">
+                <a class="gamebutton" href="subsurf/subsurfs.html"><img src="subsurf/icon.png"></a>
+                <a class="gamebutton" href="dm/index.html"><img src="dm/icon.png"></a>
+                <a class="gamebutton" href="crsyrd/index.html"><img src="crsyrd/icon.png"></a>
+                <a class="gamebutton" href="cbfld/index.html"><img src="cbfld/icon.jpg"></a>
+                <a class="gamebutton" href="rtbwl/index.html"><img src="rtbwl/icon.png"></a>
+                <a class="gamebutton" href="trts/index.html"><img src="trts/icon.png"></a>
+                <a class="gamebutton" href="chtwntftet/couch/index.html"><img src="chtwntftet/icon.jpg"></a>
+                <a class="gamebutton" href="cloak/index.html"><img src="cloak.png"></a>
+            </div>
+        </section>
+
+        <section class="privacy-section">
+            <h1>Privacy first</h1>
+            <img src="lock.png" alt="Lock Icon" style="display: block; margin: 0 auto; cursor: pointer;" id="lockIcon">
+            <p>Anonymity<br>ALT + SHIFT to redirect to Google. Note: This only works on the home screen and there is no back for extra security</p>
+        </section>
+
+        <section class="contact-section">
+            <h1>Contact</h1>
+            <div class="contacts">
+                <a class="contactbutton" href="mailto:playboicarti225@protonmail.com?subject=Your Homework Site"><img src="gmail.jpg" alt="Gmail Icon"></a>
+            </div>
+        </section>
+    </main>
+
+    <!-- External JavaScript -->
+    <script src="scripts.js"></script>
+    <script>
+        // Function to toggle rainbow background effect
+        function toggleRainbowBackground() {
+            document.body.classList.toggle('rainbow-background');
+        }
+
+        // Add click event listener to lock icon
+        document.getElementById('lockIcon').addEventListener('click', toggleRainbowBackground);
+
+        // Function to handle Alt + Shift key press
+        function handleKeyPress(event) {
+            if (event.altKey && event.shiftKey) {
+                window.location.href = "https://www.google.com";
+            }
+        }
+
+        // Add keydown event listener to document
+        document.addEventListener('keydown', handleKeyPress);
+    </script>
+</body>
+</html>
