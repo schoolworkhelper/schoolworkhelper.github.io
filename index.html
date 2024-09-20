@@ -1,77 +1,266 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Algebra Past Papers</title>
     <link rel="icon" type="x-icon" href="fakeformative.png">
-    <!-- Load external CSS styles -->
-    <link rel="stylesheet" href="styles.css">
+    
     <style>
-        /* Include the updated CSS styles here */
+        /* Basic page layout and styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #1b1b1b;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Center content styling */
+        #content {
+            z-index: 2;
+            text-align: center;
+        }
+
+        h3 {
+            font-weight: normal;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        /* Input field styling */
+        #key-input {
+            width: 60%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid gold;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #key-input:focus {
+            box-shadow: 0 0 15px gold;
+        }
+
+        /* Submit button styling */
+        button {
+            padding: 10px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            background-color: gold;
+            color: black;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: darkgoldenrod;
+            transform: scale(1.05);
+        }
+
+        /* Loading dots animation */
+        .loading-dots {
+            display: none;
+        }
+
+        .loading-dots.show {
+            display: block;
+            text-align: center;
+        }
+
+        .loading-dot {
+            display: inline-block;
+            margin: 0 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: gold;
+            animation: jump 1s infinite ease-in-out;
+        }
+
         @keyframes jump {
             0%, 20%, 80%, 100% {
                 transform: translateY(0);
             }
             40% {
-                transform: translateY(-20px);
-            }
-            60% {
                 transform: translateY(-10px);
             }
+            60% {
+                transform: translateY(-5px);
+            }
         }
-        .loading-dots {
-            display: none;
-        }
-        .loading-dots.show {
-            display: block;
-            text-align: center;
-        }
-        .loading-dot {
-            display: inline-block;
-            margin: 0 2px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #000;
-            animation: jump 1s infinite ease-in-out;
-        }
+
         .loading-dot:nth-child(2) {
-            animation-delay: 0.15s;
+            animation-delay: 0.2s;
         }
         .loading-dot:nth-child(3) {
-            animation-delay: 0.25s;
+            animation-delay: 0.4s;
         }
-        .loading-dot:nth-child(4) {
-            animation-delay: 0.35s;
+
+        /* Particles.js container */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #1b1b1b;
+            z-index: 1;
         }
-        .loading-dots.gold .loading-dot {
-            background-color: gold;
-            box-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
+
+        /* Error message */
+        #error-msg {
+            color: red;
+            display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <center> <img src="favicon.png" width="200" height="200"> </center>
-    <h3>-~- GCSE Help, Maths, Science, History, English, Geography, French, Latin, Spanish and more!-~-</h3>
+    <!-- Particles.js container -->
+    <div id="particles-js"></div>
 
-    <!-- Authentication form -->
-    <div id="auth-form">
-        <input type="text" id="key-input" placeholder="Enter key">
-        <button onclick="authenticate()">Submit</button>
+    <!-- Content center -->
+    <div id="content">
+        <img src="favicon.png" width="150" height="150" alt="Icon">
+        <h3>-~- GCSE Help: Maths, Science, History, English, and more! -~-</h3>
+
+        <!-- Authentication form -->
+        <div id="auth-form">
+            <input type="text" id="key-input" placeholder="Enter key">
+            <button onclick="authenticate()">Submit</button>
+        </div>
+
+        <!-- Loading animation -->
+        <div class="loading-dots" id="loading-dots">
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+        </div>
+
+        <!-- Error message -->
+        <p id="error-msg">Invalid key. Are you even sigma?</p>
     </div>
 
-    <!-- Loading animation -->
-    <div class="loading-dots" id="loading-dots">
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-    </div>
-
-    <p id="error-msg" style="color: red; display: none;"></p>
+    <!-- Load Particles.js script -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <script>
-        // Function to fetch valid keys from keys.json
+        // Initialize particles.js with configuration
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Fetch valid keys from keys.json
         async function fetchValidKeys() {
             try {
                 const response = await fetch('keys.json');
@@ -83,9 +272,9 @@
             }
         }
 
-        // Function to authenticate using key
+        // Authenticate key
         async function authenticate() {
-            // Show loading animation
+            // Hide form and show loading animation
             document.getElementById("auth-form").style.display = "none";
             const loadingDots = document.getElementById("loading-dots");
             loadingDots.classList.add("show");
@@ -95,34 +284,29 @@
                 const enteredKey = document.getElementById("key-input").value.trim();
                 const validKeys = await fetchValidKeys();
 
-                // Check if the entered key is valid
-                if (enteredKey === "banananesquik","premium") {
-                    // Redirect to premium.html and apply golden dots
-                    window.location.href = "premium.html";
-                    loadingDots.classList.add("gold");
-                } else if (validKeys.includes(enteredKey)) {
-                    // Check if the key has been used before
+                // Check if entered key is valid
+                if (validKeys.includes(enteredKey)) {
                     const keyStatus = localStorage.getItem(enteredKey);
                     if (keyStatus === null) {
+                        // Key is valid and unused
                         window.location.href = "games.html?redirected=true";
                     } else {
                         // Key has already been used
                         document.getElementById("error-msg").innerText = "This key has already been used.";
                         document.getElementById("error-msg").style.display = "block";
-                        // Hide loading animation
                         document.getElementById("auth-form").style.display = "block";
                         loadingDots.classList.remove("show");
                     }
                 } else {
                     // Key is invalid
-                    document.getElementById("error-msg").innerText = "Invalid key. Are you even sigma?.";
+                    document.getElementById("error-msg").innerText = "Invalid key. Are you even sigma?";
                     document.getElementById("error-msg").style.display = "block";
-                    // Hide loading animation
                     document.getElementById("auth-form").style.display = "block";
                     loadingDots.classList.remove("show");
                 }
-            }, 3000); // 3 seconds
+            }, 3000);
         }
     </script>
 </body>
 </html>
+
