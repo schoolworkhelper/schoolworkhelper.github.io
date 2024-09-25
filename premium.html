@@ -3,157 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login to the VLE</title>
+    <title>Modern VLE</title>
     <link rel="icon" type="image/png" href="fakeformative.png">
-    <!-- External CSS styles -->
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
+
     <style>
-        /* Custom styles for rounded buttons and task hover effect */
+        /* Global Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Container for content */
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        header img {
+            width: 150px;
+            height: 150px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #ffffff;
+        }
+
+        main {
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        .login-section {
+            margin-bottom: 30px;
+        }
+
+        .login-section input {
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+        }
+
         .button {
+            background-color: #6200ea;
+            color: #fff;
+            border: none;
             border-radius: 20px;
             padding: 10px 20px;
+            margin: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
 
         .button:hover {
-            background-color: #FFD700;
+            background-color: #3700b3;
+        }
+
+        .homework-section, .due-tasks-section {
+            margin-bottom: 50px;
+        }
+
+        .homework-section h1, .due-tasks-section h1, .privacy-section h1, .contact-section h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .games {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .gamebutton {
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin: 10px;
             transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 10px;
+        }
+
+        .gamebutton img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
         }
 
         .gamebutton:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* CSS class for rainbow strobe effect */
-        .rainbow-background {
-            animation: rainbow 0.5s infinite;
+        .privacy-section img {
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
         }
 
-        @keyframes rainbow {
-            0% {
-                background-color: red;
-            }
-            20% {
-                background-color: orange;
-            }
-            40% {
-                background-color: yellow;
-            }
-            60% {
-                background-color: green;
-            }
-            80% {
-                background-color: blue;
-            }
-            100% {
-                background-color: purple;
-            }
-        }
-
-        /* Background color */
-        body {
-            background-color: #FFD700;
+        footer {
+            margin-top: 50px;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <header>
-        <center> <img src="favicon.png" alt="VLE Logo" width="200" height="200"> </center>
-        <h3>-~- Premium Non-Smoothwall Homework -~-</h3>
-    </header>
+    <!-- Particles.js background -->
+    <div id="particles-js"></div>
 
-    <main>
-        <section class="login-section">
+    <div class="container">
+        <header>
             <center>
-                <input type="text" name="username" class="input navbar-control" placeholder="Enter fake title" value="Formative" id="title">
-                <input type="text" name="password" class="input navbar-control" placeholder="fakeformative.png" value="fakeformative.png" id="icon">
-                <br>
-                <button class="button navbar-control" type="button" id="btnTitle">Set title</button>
-                <button class="button navbar-control" type="button" id="btnIcon">Set Icon</button>
-                <button class="button navbar-control" type="button" id="btnReset">Reset</button>
+                <img src="favicon.png" alt="VLE Logo">
             </center>
-        </section>
+            <h3>Premium Non-Smoothwall Homework</h3>
+        </header>
 
-        <section class="homework-section">
-            <h1>Homework Tasks (20)</h1>
-            <div class="games">
-                <a class="gamebutton" href="twenT48/index.html"><img src="twenT48/icon.png"></a>
-                <a class="gamebutton" href="hxtrs/index.html"><img src="hxtrs/icon.png"></a>
-                <a class="gamebutton" href="rdsrd/index.html"><img src="rdsrd/icon.png"></a>
-                <a class="gamebutton" href="emjmnswp/index.html"><img src="emjmnswp/icon.png"></a>
-                <a class="gamebutton" href="infmar/main.html"><img src="infmar/icon.png"></a>
-                <a class="gamebutton" href="twdf/index.html"><img src="twdf/icon.png"></a>
-                <a class="gamebutton" href="typr/typr.html"><img src="typr/icon.png"></a>
-                <a class="gamebutton" href="f1/index.html"><img src="f1/icon.png"></a>
-                <a class="gamebutton" href="wlfjs/index.html"><img src="wlfjs/icon.png"></a>
-                <a class="gamebutton" href="gtwyshtut/index.html"><img src="gtwyshtut/icon.png"></a>
-                <a class="gamebutton" href="tptptp/index.html"><img src="tptptp/icon.png"></a>
-                <a class="gamebutton" href="stckmnhk/index.html"><img src="stckmnhk/icon.jpg"></a>
-                <a class="gamebutton" href="flpybrd/index.html"><img src="flpybrd/icon.png"></a>
-                <a class="gamebutton" href="chrdno/index.html"><img src="chrdno/icon.png"></a>
-                <a class="gamebutton" href="stck/index.html"><img src="stck/icon.png"></a>
-                <a class="gamebutton" href="wdl/index.html"><img src="wdl/icon.png"></a>
-                <a class="gamebutton" href="cc/index.html"><img src="cc/icon.png"></a>
-                <a class="gamebutton" href="rlyvtx/index.html"><img src="rlyvtx/icon.png"></a>
-                <a class="gamebutton" href="tnyfsh/index.html"><img src="tnyfsh/icon.png"></a>
-                <a class="gamebutton" href="egycr/index.html"><img src="egycr/icon.png"></a>
-            </div>
-        </section>
+        <main>
+            <section class="login-section">
+                <input type="text" placeholder="Enter fake title" id="title">
+                <input type="text" placeholder="fakeformative.png" id="icon">
+                <br>
+                <button class="button" type="button" id="btnTitle">Set Title</button>
+                <button class="button" type="button" id="btnIcon">Set Icon</button>
+                <button class="button" type="button" id="btnReset">Reset</button>
+            </section>
 
-        <section class="due-tasks-section">
-            <h1>Premium Tasks(7)</h1>
-            <p>Your rewards as a customer!!</p>
-            <div class="games">
-                <a class="gamebutton" href="bball.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/basketball-stars.png?raw=true"></a>
-                <a class="gamebutton" href="8ball.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/8-ball-pool.png?raw=true"></a>
-                <a class="gamebutton" href="ageofwar.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/age-of-war.png?raw=true"></a>
-                <a class="gamebutton" href="bottleflip.html"><img src="https://github.com/schoolworkhelper/schoolworkhelper.github.io/blob/main/assets/img/games/bottle-flip.png?raw=true"></a>
-            </div>
-        </section>
+            <section class="homework-section">
+                <h1>Homework Tasks (20)</h1>
+                <div class="games">
+                    <!-- Homework Game Buttons -->
+                    <a class="gamebutton" href="twenT48/index.html"><img src="twenT48/icon.png"></a>
+                    <a class="gamebutton" href="hxtrs/index.html"><img src="hxtrs/icon.png"></a>
+                    <a class="gamebutton" href="rdsrd/index.html"><img src="rdsrd/icon.png"></a>
+                    <a class="gamebutton" href="emjmnswp/index.html"><img src="emjmnswp/icon.png"></a>
+                    <a class="gamebutton" href="infmar/main.html"><img src="infmar/icon.png"></a>
+                    <a class="gamebutton" href="twdf/index.html"><img src="twdf/icon.png"></a>
+                    <a class="gamebutton" href="typr/typr.html"><img src="typr/icon.png"></a>
+                    <a class="gamebutton" href="f1/index.html"><img src="f1/icon.png"></a>
+                    <a class="gamebutton" href="wlfjs/index.html"><img src="wlfjs/icon.png"></a>
+                    <a class="gamebutton" href="tptptp/index.html"><img src="tptptp/icon.png"></a>
+                    <a class="gamebutton" href="stckmnhk/index.html"><img src="stckmnhk/icon.jpg"></a>
+                    <a class="gamebutton" href="flpybrd/index.html"><img src="flpybrd/icon.png"></a>
+                    <a class="gamebutton" href="chrdno/index.html"><img src="chrdno/icon.png"></a>
+                    <a class="gamebutton" href="stck/index.html"><img src="stck/icon.png"></a>
+                    <a class="gamebutton" href="wdl/index.html"><img src="wdl/icon.png"></a>
+                    <a class="gamebutton" href="rlyvtx/index.html"><img src="rlyvtx/icon.png"></a>
+                    <a class="gamebutton" href="tnyfsh/index.html"><img src="tnyfsh/icon.png"></a>
+                    <a class="gamebutton" href="egycr/index.html"><img src="egycr/icon.png"></a>
+                </div>
+            </section>
 
-        <section class="privacy-section">
-            <h1>Privacy first</h1>
-            <img src="lock.png" alt="Lock Icon" style="display: block; margin: 0 auto; cursor: pointer;" id="lockIcon">
-            <p>Anonymity<br>ALT + SHIFT to redirect to Google. Note: This only works on the home screen and there is no back for extra security. Over 200 Games are coming to premium</p>
-        </section>
+            <section class="due-tasks-section">
+                <h1>Premium Tasks (7)</h1>
+                <p>Your rewards as a customer!</p>
+                <div class="games">
+                    <a class="gamebutton" href="bball.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/basketball-stars.png?raw=true"></a>
+                    <a class="gamebutton" href="8ball.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/8-ball-pool.png?raw=true"></a>
+                    <a class="gamebutton" href="ageofwar.html"><img src="https://github.com/ubg98/ubg98.github.io/blob/gh-pages/assets/img/games/age-of-war.png?raw=true"></a>
+                    <a class="gamebutton" href="bottleflip.html"><img src="https://github.com/schoolworkhelper/schoolworkhelper.github.io/blob/main/assets/img/games/bottle-flip.png?raw=true"></a>
+                </div>
+            </section>
 
-        <section class="contact-section">
-            <h1>Contact</h1>
-            <div class="contacts">
-                <a class="contactbutton" href="mailto:playboicarti225@protonmail.com?subject=Your Homework Site"><img src="gmail.jpg" alt="Gmail Icon"></a>
-            </div>
-        </section>
-    </main>
+            <section class="privacy-section">
+                <h1>Privacy First</h1>
+                <img src="lock.png" alt="Lock Icon" id="lockIcon">
+                <p>ALT + SHIFT to redirect to Google. No back button for extra security.</p>
+            </section>
 
-    <!-- External JavaScript -->
-    <script src="scripts.js"></script>
-    <script>
-        // Function to toggle rainbow background effect
-        function toggleRainbowBackground() {
-            document.body.classList.toggle('rainbow-background');
-        }
+            <section class="contact-section">
+                <h1>Contact</h1>
+                <a class="contactbutton" href="mailto:playboicarti225@protonmail.com?subject=Your Homework Site">
+                    <img src="gmail.jpg" alt="Gmail Icon" width="50">
+                </a>
+            </section>
+        </main>
 
-        // Add click event listener to lock icon
-        document.getElementById('lockIcon').addEventListener('click', toggleRainbowBackground);
+        <footer>
+            &copy; 2024 Premium Non-Smoothwall Homework
+        </footer>
+    </div>
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
-        // Function to handle Alt + Shift key press
-        function handleKeyPress(event) {
-            if (event.altKey && event.shiftKey) {
-                window.location.href = "https://www.google.com";
+    <!-- Particles.js Initialization -->
+<script>
+    /* Particles.js Config */
+    particlesJS("particles-js", {
+        "particles": {
+            "number": {
+                "value": 400,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#fff"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                },
+                "polygon": {
+                    "nb_sides": 5
+                }
+            },
+            "opacity": {
+                "value": 0.5,
+                "random": true
+            },
+            "size": {
+                "value": 10,
+                "random": true
+            },
+            "line_linked": {
+                "enable": false
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "bottom",
+                "out_mode": "out"
             }
-        }
-
-        // Add keydown event listener to document
-        document.addEventListener('keydown', handleKeyPress);
-    </script>
-</body>
-</html>
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": {
+                    "enable": true,
+                    "mode": "bubble"
+                },
+                "onclick": {
+                    "enable": true,
+                    "mode": "repulse"
+                }
+            }
+        },
+        "retina_detect": true
+    });
+</script>
