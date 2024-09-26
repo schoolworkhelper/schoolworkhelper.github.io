@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Game Launcher</title>
+    <title>Modern Game Launcher with CORS Proxy</title>
     <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
     <style>
         body, html {
@@ -74,20 +74,22 @@
                 alert("Please enter a URL.");
                 return;
             }
-            
-            // Make sure the URL starts with http or https
+
+            // Ensure URL starts with http or https
             if (!urlInput.startsWith("http://") && !urlInput.startsWith("https://")) {
                 urlInput = "https://" + urlInput;
             }
 
-            var win = window.open("", "_blank", "width=1000,height=700");
+            // Use CORS proxy to bypass cross-origin issues
+            var corsProxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(urlInput);
+
+            // Open a new window and embed an iframe with the proxied URL
+            var win = window.open("about:blank");
             var iframe = win.document.createElement('iframe');
             iframe.style.width = "100%";
             iframe.style.height = "100%";
             iframe.style.border = "none";
-            iframe.src = urlInput;
-            win.document.body.style.margin = "0"; // To remove body margins for full iframe display
-            win.document.body.style.overflow = "hidden"; // Disable scrollbars
+            iframe.src = corsProxyUrl;
             win.document.body.appendChild(iframe);
         }
     </script>
