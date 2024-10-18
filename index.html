@@ -151,178 +151,187 @@
 
     <!-- Load Particles.js script -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script>
-    // Initialize particles.js with configuration
-    particlesJS("particles-js", {
-        "particles": {
-            "number": {
-                "value": 100,
-                "density": {
-                    "enable": true,
-                    "value_area": 800
-                }
-            },
-            "color": {
-                "value": "#ffffff"
-            },
-            "shape": {
-                "type": "circle",
-                "stroke": {
-                    "width": 0,
-                    "color": "#000000"
-                },
-                "polygon": {
-                    "nb_sides": 5
-                }
-            },
-            "opacity": {
-                "value": 0.5,
-                "random": false,
-                "anim": {
-                    "enable": false,
-                    "speed": 1,
-                    "opacity_min": 0.1,
-                    "sync": false
-                }
-            },
-            "size": {
-                "value": 3,
-                "random": true,
-                "anim": {
-                    "enable": false,
-                    "speed": 40,
-                    "size_min": 0.1,
-                    "sync": false
-                }
-            },
-            "line_linked": {
-                "enable": true,
-                "distance": 150,
-                "color": "#ffffff",
-                "opacity": 0.4,
-                "width": 1
-            },
-            "move": {
-                "enable": true,
-                "speed": 6,
-                "direction": "none",
-                "random": false,
-                "straight": false,
-                "out_mode": "out",
-                "bounce": false,
-                "attract": {
-                    "enable": false,
-                    "rotateX": 600,
-                    "rotateY": 1200
-                }
-            }
-        },
-        "interactivity": {
-            "detect_on": "canvas",
-            "events": {
-                "onhover": {
-                    "enable": true,
-                    "mode": "repulse"
-                },
-                "onclick": {
-                    "enable": true,
-                    "mode": "push"
-                },
-                "resize": true
-            },
-            "modes": {
-                "grab": {
-                    "distance": 400,
-                    "line_linked": {
-                        "opacity": 1
+    <script>
+        // Initialize particles.js with configuration
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
                     }
                 },
-                "bubble": {
-                    "distance": 400,
-                    "size": 40,
-                    "duration": 2,
-                    "opacity": 8,
-                    "speed": 3
+                "color": {
+                    "value": "#ffffff"
                 },
-                "repulse": {
-                    "distance": 200,
-                    "duration": 0.4
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
                 },
-                "push": {
-                    "particles_nb": 4
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
                 },
-                "remove": {
-                    "particles_nb": 2
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
                 }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Fetch valid keys from keys.json
+        async function fetchValidKeys() {
+            try {
+                const response = await fetch('keys.json');
+                const keysData = await response.json();
+                return keysData.keys;
+            } catch (error) {
+                console.error('Error fetching valid keys:', error);
+                return [];
             }
-        },
-        "retina_detect": true
-    });
-
-    // Fetch valid keys from keys.json
-    async function fetchValidKeys() {
-        try {
-            const response = await fetch('keys.json');
-            const keysData = await response.json();
-            return keysData.keys;
-        } catch (error) {
-            console.error('Error fetching valid keys:', error);
-            return [];
         }
-    }
 
-    // Fetch premium keys from premium.txt
-    async function fetchPremiumKeys() {
-        try {
-            const response = await fetch('premium.txt');
-            const premiumKeysData = await response.text();
-            return premiumKeysData.split(/\r?\n/); // Split by newlines for keys
-        } catch (error) {
-            console.error('Error fetching premium keys:', error);
-            return [];
+        // Fetch premium keys from premium.txt
+        async function fetchPremiumKeys() {
+            try {
+                const response = await fetch('premium.txt');
+                const premiumKeysData = await response.text();
+                return premiumKeysData.split(/\r?\n/); // Split by newlines for keys
+            } catch (error) {
+                console.error('Error fetching premium keys:', error);
+                return [];
+            }
         }
-    }
 
-    // Authenticate key
-    async function authenticate() {
-        // Hide form and show loading animation
-        document.getElementById("auth-form").style.display = "none";
-        const loadingDots = document.getElementById("loading-dots");
-        loadingDots.classList.add("show");
-
-        // Simulate loading for 3 seconds
-        setTimeout(async () => {
+        // Authenticate key
+        async function authenticate() {
             const enteredKey = document.getElementById("key-input").value.trim();
-            const validKeys = await fetchValidKeys();
-            const premiumKeys = await fetchPremiumKeys();
 
-            // Check if entered key is a premium key
-            if (premiumKeys.includes(enteredKey)) {
-                window.location.href = "premium.html";
-            } 
-            // Check if entered key is a regular valid key
-            else if (validKeys.includes(enteredKey)) {
-                const keyStatus = localStorage.getItem(enteredKey);
-                if (keyStatus === null) {
-                    // Key is valid and unused
-                    window.location.href = "games.html?redirected=true";
-                } else {
-                    // Key has already been used
-                    document.getElementById("error-msg").innerText = "This key has already been used.";
-                    document.getElementById("error-msg").style.display = "block";
-                    document.getElementById("auth-form").style.display = "block";
-                    loadingDots.classList.remove("show");
-                }
-            } else {
-                // Key is invalid
-                document.getElementById("error-msg").innerText = "Invalid key. Are you even sigma?";
+            // Check if the entered key is empty
+            if (!enteredKey) {
+                document.getElementById("error-msg").innerText = "Please enter a key.";
                 document.getElementById("error-msg").style.display = "block";
-                document.getElementById("auth-form").style.display = "block";
-                loadingDots.classList.remove("show");
+                return; // Exit the function if the input is empty
             }
-        }, 3000);
-    }
-</script>
 
+            // Hide the form and show loading animation
+            document.getElementById("auth-form").style.display = "none";
+            const loadingDots = document.getElementById("loading-dots");
+            loadingDots.classList.add("show");
+
+            // Simulate loading for 3 seconds
+            setTimeout(async () => {
+                const validKeys = await fetchValidKeys();
+                const premiumKeys = await fetchPremiumKeys();
+
+                // Check if the entered key is a premium key
+                if (premiumKeys.includes(enteredKey)) {
+                    window.location.href = "premium.html";
+                } 
+                // Check if the entered key is a regular valid key
+                else if (validKeys.includes(enteredKey)) {
+                    const keyStatus = localStorage.getItem(enteredKey);
+                    if (keyStatus === null) {
+                        // Key is valid and unused
+                        window.location.href = "games.html?redirected=true";
+                    } else {
+                        // Key has already been used
+                        showError("This key has already been used.");
+                    }
+                } else {
+                    // Key is invalid
+                    showError("Invalid key. Are you even sigma?");
+                }
+                loadingDots.classList.remove("show");
+            }, 3000);
+        }
+
+        // Function to show error messages
+        function showError(message) {
+            document.getElementById("error-msg").innerText = message;
+            document.getElementById("error-msg").style.display = "block";
+            document.getElementById("auth-form").style.display = "block";
+        }
+    </script>
 </body>
 </html>
