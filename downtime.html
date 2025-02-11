@@ -1,5 +1,139 @@
-// 11th Feb 2025 , https://schoolwork.betteruptime.com/maintenance
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Under Maintenance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<h1>i made this really quickly</h1>
-<h2> what happened??</h2>
-<p> I am remaking the site entirely, see info [here](https://schoolwork.betteruptime.com/maintenance)</p>
+        body {
+            background: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .maintenance-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cog-wheel img {
+            width: 100px;
+            animation: spin 4s linear infinite;
+        }
+
+        @key 0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 20px 0;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <div class="maintenance-container">
+        <div class="cog-wheel">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Cog_%28PSF%29.png" alt="Cog Wheel">
+        </div>
+        <h1>We're Under Maintenance</h1>
+        <p>We're working hard to improve our website. Please check back later.</p>
+        <a href="https://schoolwork.betteruptime.com/maintenance" target="_blank">Check Maintenance Status</a>
+    </div>
+
+    <script>
+        // Particles.js library
+        (function() {
+            var pJS = function(tag_id, params) {
+                var canvas_el = document.createElement('canvas');
+                document.getElementById(tag_id).appendChild(canvas_el);
+                var canvas = canvas_el, ctx = canvasd');
+                
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                var particles = [];
+                for (var i = 0; i < 100; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 3 + 1,
+                        dx: (Math.random() - 0.5) * 2,
+                        dy: (Math.random() - 0.5) * 2
+                    });
+                }
+
+                function drawParticles() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "#ffffff";
+                    particles.forEach(function(p) {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        p.x += p.dx;
+                        p.y += p.dy;
+                        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+                        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+                    });
+                    requestAnimationFrame(drawParticles);
+                }
+
+                drawParticles();
+            };
+
+            window.addEventListener("load", function() {
+                pJS("particles-js", {});
+            });
+
+            window.addEventListener("resize", function() {
+                var canvas = document.querySelector("#particles-js canvas");
+                if (canvas) {
+                    canvas.width = window.innerWidth;
+                   Height;
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
