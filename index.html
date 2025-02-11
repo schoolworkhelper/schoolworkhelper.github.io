@@ -306,14 +306,14 @@
 
                 // Check if the entered key is a premium key
                 if (premiumKeys.includes(enteredKey)) {
-                    window.location.href = "premium.html";
+                    window.location.href = "downtime.html"; // change to premium.html after
                 } 
                 // Check if the entered key is a regular valid key
                 else if (validKeys.includes(enteredKey)) {
                     const keyStatus = localStorage.getItem(enteredKey);
                     if (keyStatus === null) {
                         // Key is valid and unused
-                        window.location.href = "games.html?redirected=true";
+                        window.location.href = "downtime.html?redirected=true"; // change to games.html?redirected=true after 
                     } else {
                         // Key has already been used
                         showError("This key has already been used.");
