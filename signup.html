@@ -6,15 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' blob: data:;">
     <style>
-        body { margin: 20px; font-family: Arial, sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { margin-bottom: 20px; }
+        body { margin: 0; font-family: Arial, sans-serif; }
+        .container { padding: 15px; }
+        .header { 
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
         input[type="text"] { 
-            width: 70%; 
+            flex: 1;
             padding: 12px;
             border: 2px solid #4CAF50;
             border-radius: 25px;
             font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
         button { 
             padding: 12px 25px;
@@ -24,14 +34,26 @@
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
+            transition: all 0.3s;
         }
         button:hover { background: #45a049; }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #1976D2;
+        }
         iframe { 
-            width: 100%; 
-            height: 80vh; 
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            margin-top: 15px;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .iframe-visible {
+            z-index: 1000 !important;
         }
         .loading {
             display: none;
@@ -44,6 +66,7 @@
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            z-index: 2000;
         }
         .progress-bar {
             width: 300px;
@@ -64,19 +87,63 @@
             width: 15px;
             height: 15px;
             border-radius: 50%;
-            margin-left: 10px;
-            vertical-align: middle;
+        }
+        .welcome-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 600px;
+            display: none;
+            z-index: 3000;
+        }
+        .banner-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .banner-header {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+        .banner-text {
+            margin: 0;
+            color: #34495e;
+            line-height: 1.5;
+        }
+        .banner-close {
+            align-self: flex-end;
+            padding: 8px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .banner-close:hover {
+            background: #45a049;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <button onclick="checkServer()">Server Status</button>
+            <input type="text" id="urlInput" placeholder="Enter website URL">
+            <button onclick="loadUrl()">Browse</button>
+            <button class="secondary" onclick="checkServer()">Status</button>
             <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
         </div>
-        <input type="text" id="urlInput" placeholder="Enter website URL (e.g., crazygames.com)">
-        <button onclick="loadUrl()">Browse</button>
+        <div class="button-group">
+            <button class="secondary" onclick="toggleFullscreen()" id="fullscreenBtn">
+                Enter Fullscreen
+            </button>
+        </div>
         <div class="loading" id="loading">
             <div class="progress-bar">
                 <div class="progress" id="progress"></div>
@@ -86,10 +153,70 @@
         <iframe id="contentFrame"></iframe>
     </div>
 
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" id="welcomeBanner">
+        <div class="banner-content">
+            <h3 class="banner-header">Welcome to Pi Web Proxy!</h3>
+            <p class="banner-text">
+                This is a secure web proxy service hosted on a Raspberry Pi. 
+                Please note that some websites may not load perfectly due to 
+                content security restrictions. Enjoy safe browsing!
+            </p>
+            <button class="banner-close" onclick="dismissBanner()">Got It!</button>
+        </div>
+    </div>
+
     <script>
         const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
         let progressInterval;
 
+        // Cookie functions
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        }
+
+        function getCookie(name) {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith(`${name}=`))
+                ?.split('=')[1];
+        }
+
+        // Banner control
+        function showBanner() {
+            if(!getCookie('bannerDismissed')) {
+                document.getElementById('welcomeBanner').style.display = 'block';
+            }
+        }
+
+        function dismissBanner() {
+            setCookie('bannerDismissed', 'true', 365);
+            document.getElementById('welcomeBanner').style.display = 'none';
+        }
+
+        // Fullscreen functions
+        function toggleFullscreen() {
+            const frame = document.getElementById('contentFrame');
+            const btn = document.getElementById('fullscreenBtn');
+            
+            if(!document.fullscreenElement) {
+                frame.classList.add('iframe-visible');
+                if(frame.requestFullscreen) {
+                    frame.requestFullscreen().catch(err => {
+                        alert('Fullscreen failed: ' + err.message);
+                    });
+                }
+                btn.textContent = 'Exit Fullscreen';
+            } else {
+                document.exitFullscreen();
+                frame.classList.remove('iframe-visible');
+                btn.textContent = 'Enter Fullscreen';
+            }
+        }
+
+        // Existing proxy functions
         function updateProgress(percent) {
             document.getElementById('progress').style.width = `${percent}%`;
         }
@@ -108,13 +235,6 @@
                 alert('❌ Server connection failed!');
                 document.getElementById('statusDot').style.background = '#f44336';
             }
-        }
-
-        function handleNavigation(event) {
-            event.preventDefault();
-            const newUrl = event.target.href || event.target.action;
-            document.getElementById('urlInput').value = newUrl;
-            loadUrl();
         }
 
         async function loadUrl() {
@@ -147,13 +267,6 @@
                     setTimeout(() => {
                         loading.style.display = 'none';
                     }, 300);
-
-                    try {
-                        const doc = frame.contentDocument || frame.contentWindow.document;
-                        doc.querySelectorAll('a, form').forEach(element => {
-                            element.addEventListener(element.tagName === 'A' ? 'click' : 'submit', handleNavigation);
-                        });
-                    } catch {}
                 };
 
                 frame.onerror = () => {
@@ -167,13 +280,24 @@
             }
         }
 
-        // Enter key support
+        // Event listeners
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            if(!document.fullscreenElement) {
+                btn.textContent = 'Enter Fullscreen';
+                document.getElementById('contentFrame').classList.remove('iframe-visible');
+            }
+        });
+
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
             if(e.key === 'Enter') loadUrl();
         });
 
-        // Initial status check
-        checkServer();
+        // Initial setup
+        window.addEventListener('load', () => {
+            showBanner();
+            checkServer();
+        });
     </script>
 </body>
 </html>
