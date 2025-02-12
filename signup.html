@@ -1,200 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pi Proxy Browser</title>
+    <title>Pi Proxy</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-        .browser-ui {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .url-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        #urlInput {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        .loading-screen {
+        body { margin: 20px; font-family: Arial; }
+        .container { max-width: 800px; margin: 0 auto; }
+        input[type="text"] { width: 70%; padding: 8px; }
+        button { padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        iframe { width: 100%; height: 80vh; border: 1px solid #ddd; margin-top: 10px; }
+        .loading { 
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        }
-        .progress-container {
-            width: 300px;
-            height: 20px;
-            background: #eee;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px auto;
         }
         .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: #ddd;
+            margin: 10px auto;
+        }
+        .progress {
             width: 0%;
             height: 100%;
             background: #4CAF50;
             transition: width 0.3s ease;
         }
-        #percentage {
-            font-size: 18px;
-            color: #333;
-            margin-top: 10px;
-        }
-        #contentFrame {
-            width: 100%;
-            height: 80vh;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            display: none;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-left: 10px;
-        }
     </style>
 </head>
 <body>
-    <div class="browser-ui">
-        <div style="margin-bottom: 20px; text-align: center;">
-            <button onclick="checkServerStatus()">Check Server Status</button>
-            <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
-        </div>
-        <div class="url-bar">
-            <input type="text" id="urlInput" placeholder="Enter website URL (e.g., example.com)">
-            <button onclick="loadUrl()">GO</button>
-        </div>
-        <div class="loading-screen" id="loading">
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+    <div class="container">
+        <input type="text" id="urlInput" placeholder="Enter URL (e.g., example.com)">
+        <button onclick="loadUrl()">GO</button>
+        <div class="loading" id="loading">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
             </div>
-            <div id="percentage">0%</div>
+            <div>Loading...</div>
         </div>
         <iframe id="contentFrame"></iframe>
     </div>
 
     <script>
-        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app/proxy';
-        const PING_URL = 'https://garfish-capital-reindeer.ngrok-free.app/ping';
-        let progressInterval;
-
+        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
+        
         function updateProgress(percent) {
-            const progressBar = document.getElementById('progressBar');
-            const percentage = document.getElementById('percentage');
-            progressBar.style.width = `${percent}%`;
-            percentage.textContent = `${Math.min(Math.floor(percent), 99)}%`;
+            document.getElementById('progress').style.width = `${percent}%`;
         }
 
-        function simulateProgress() {
-            let current = 0;
-            progressInterval = setInterval(() => {
-                current = Math.min(current + Math.random() * 3, 99);
-                updateProgress(current);
-            }, 50);
-        }
-
-        async function checkServerStatus() {
+        async function checkServer() {
             try {
-                const response = await fetch(PING_URL);
-                if(response.ok) {
-                    alert('Server is online! 🟢');
-                    document.getElementById('statusDot').style.background = '#4CAF50';
-                } else {
-                    throw new Error();
-                }
+                const response = await fetch(`${PROXY_SERVER}/ping`);
+                alert(response.ok ? 'Server is online! 🟢' : 'Server error 🔴');
             } catch {
-                alert('Server offline! 🔴');
-                document.getElementById('statusDot').style.background = '#f44336';
+                alert('Server unreachable 🔴');
             }
         }
 
-        function handleNavigation(event) {
-            event.preventDefault();
-            const url = event.target.href || event.target.action;
-            document.getElementById('urlInput').value = url;
-            loadUrl();
-        }
-
-        async function loadUrl() {
-            const urlInput = document.getElementById('urlInput');
-            const loading = document.getElementById('loading');
-            const frame = document.getElementById('contentFrame');
-            
-            let url = urlInput.value.trim();
+        function loadUrl() {
+            const url = document.getElementById('urlInput').value.trim();
             if(!url) return alert('Please enter a URL');
             
-            if(!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = `https://${url}`;
-            }
-
+            const frame = document.getElementById('contentFrame');
+            const loading = document.getElementById('loading');
+            
             loading.style.display = 'block';
-            frame.style.display = 'none';
-            simulateProgress();
+            updateProgress(0);
+            
+            // Simple progress simulation
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 10, 90);
+                updateProgress(progress);
+            }, 100);
 
-            try {
-                frame.src = `${PROXY_SERVER}?url=${encodeURIComponent(url)}`;
-                
-                frame.onload = () => {
-                    clearInterval(progressInterval);
-                    document.getElementById('progressBar').style.width = '100%';
-                    document.getElementById('percentage').textContent = '100%';
-                    
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                        frame.style.display = 'block';
-                    }, 300);
+            frame.onload = () => {
+                clearInterval(interval);
+                updateProgress(100);
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 300);
+            };
 
-                    try {
-                        frame.contentDocument.querySelectorAll('a').forEach(link => {
-                            link.addEventListener('click', handleNavigation);
-                        });
-                    } catch {}
-                };
-
-                frame.onerror = () => {
-                    throw new Error('Failed to load content');
-                };
-            } catch(error) {
-                alert(`Error: ${error.message}`);
-                loading.style.display = 'none';
-            }
+            frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
         }
 
-        // Enter key support
-        document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') loadUrl();
-        });
-
-        // Initial check
-        checkServerStatus();
+        // Add check server button
+        document.body.insertAdjacentHTML('afterbegin', 
+            `<button style="margin-bottom: 10px" onclick="checkServer()">Check Server Status</button>`
+        );
     </script>
 </body>
 </html>
