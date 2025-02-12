@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pi Proxy Browser</title>
+    <style>
+        .browser-ui { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .url-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 8px; }
+        button { padding: 8px 20px; cursor: pointer; }
+        .loading-screen { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .progress-bar { width: 200px; height: 20px; background: #ddd; position: relative; overflow: hidden; }
+        .progress-bar::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0; background: #4CAF50; animation: progress 2s infinite linear; }
+        @keyframes progress {
+            0% { width: 0; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0; left: 100%; }
+        }
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 10px; }
+        .server-status { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="browser-ui">
+        <div class="server-status">
+            <button onclick="checkServerStatus()">Check Server Status</button>
+            <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
+        </div>
+        <div class="url-bar">
+            <input type="text" id="urlInput" placeholder="Enter any website URL">
+            <button onclick="loadUrl()">GO</button>
+        </div>
+        <div class="loading-screen" id="loading">
+            <div class="progress-bar"></div>
+            <div class="percentage" id="percentage">0%</div>
+        </div>
+        <iframe id="contentFrame" style="display: none; width: 100%; height: 80vh;"></iframe>
+    </div>
+
+    <script>
+        // Using your ngrok static domain
+        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app/proxy';
+        const PING_URL = 'https://garfish-capital-reindeer.ngrok-free.app/ping';
+
+        let progressInterval;
+
+        function simulateProgress() { // hyperlaziness, i dont care about the actual progress
+            let current = 0;
+            progressInterval = setInterval(() => {
+                current = (current + Math.random() * 10) % 100;
+                document.getElementById('percentage').textContent = 
+                    Math.min(Math.floor(current), 99) + '%';
+            }, 200);
+        }
+
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(PING_URL);
+                if(response.ok) {
+                    alert('Server is online and working! 🟢');
+                    document.getElementById('statusDot').style.background = '#4CAF50';
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                alert('Server is offline or unreachable! 🔴');
+                document.getElementById('statusDot').style.background = '#f44336';
+            }
+        }
+
+        async function loadUrl() {
+            const url = document.getElementById('urlInput').value;
+            const loadingScreen = document.getElementById('loading');
+            const frame = document.getElementById('contentFrame');
+            
+            if(!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            loadingScreen.style.display = 'block';
+            frame.style.display = 'none';
+            simulateProgress();
+
+            try {
+                frame.src = `${PROXY_SERVER}?url=${encodeURIComponent(url)}`;
+                
+                frame.onload = () => {
+                    clearInterval(progressInterval);
+                    loadingScreen.style.display = 'none';
+                    frame.style.display = 'block';
+                };
+
+                frame.onerror = () => {
+                    throw new Error('Failed to load content');
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                clearInterval(progressInterval);
+                loadingScreen.style.display = 'none';
+                alert('Error loading URL: ' + error.message);
+            }
+        }
+
+        // Initial status check
+        window.addEventListener('load', checkServerStatus);
+    </script>
+</body>
+</html>
+
+<!-- if you are reading this you are cool -->
