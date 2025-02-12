@@ -6,6 +6,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' blob: data:;">
     <style>
+        /* Password Modal Styles */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .password-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #4CAF50;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+        .password-error {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+        .main-content {
+            display: none;
+        }
+
+        /* Original Styles */
         body { margin: 0; font-family: Arial, sans-serif; }
         .container { padding: 15px; }
         .header { 
@@ -132,44 +171,88 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <input type="text" id="urlInput" placeholder="Enter website URL">
-            <button onclick="loadUrl()">Browse</button>
-            <button class="secondary" onclick="checkServer()">Status</button>
-            <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
-        </div>
-        <div class="button-group">
-            <button class="secondary" onclick="toggleFullscreen()" id="fullscreenBtn">
-                Enter Fullscreen
-            </button>
-        </div>
-        <div class="loading" id="loading">
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
+    <!-- Password Gate -->
+    <div class="password-modal" id="passwordModal">
+        <div class="password-box">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Enter Access Password</h2>
+            <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">
+            <button onclick="checkPassword()">Unlock Browser</button>
+            <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
+            <div style="margin-top: 20px; color: #666; font-size: 0.9em;">
+                Contact Owner for Password
             </div>
-            <div style="margin-top: 15px; color: #666;">Loading content...</div>
         </div>
-        <iframe id="contentFrame"></iframe>
     </div>
 
-    <!-- Welcome Banner -->
-    <div class="welcome-banner" id="welcomeBanner">
-        <div class="banner-content">
-            <h3 class="banner-header">Welcome to Pi Web Browser!</h3>
-            <p class="banner-text">
-                There will be a "ngrok" warning the first time you use (comes up once only).
-                Please click "Proceed" or "Continue".
-            </p>
-            <button class="banner-close" onclick="dismissBanner()">Got It!</button>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <div class="header">
+                <input type="text" id="urlInput" placeholder="Enter website URL">
+                <button onclick="loadUrl()">Browse</button>
+                <button class="secondary" onclick="checkServer()">Status</button>
+                <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
+            </div>
+            <div class="button-group">
+                <button class="secondary" onclick="toggleFullscreen()" id="fullscreenBtn">
+                    Enter Fullscreen
+                </button>
+            </div>
+            <div class="loading" id="loading">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div style="margin-top: 15px; color: #666;">Loading content...</div>
+            </div>
+            <iframe id="contentFrame"></iframe>
+        </div>
+
+        <div class="welcome-banner" id="welcomeBanner">
+            <div class="banner-content">
+                <h3 class="banner-header">Welcome to Pi Web Browser!</h3>
+                <p class="banner-text">
+                    There will be a "ngrok" warning the first time you use (comes up once only).
+                    Please click "Proceed" or "Continue".
+                </p>
+                <button class="banner-close" onclick="dismissBanner()">Got It!</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Password Configuration
+        const VALID_PASSWORDS = ['eac', 'udfrfr', 'be', 'test'];
+        let attempts = 0;
+        const MAX_ATTEMPTS = 5;
+        let isAuthenticated = false;
+
+        function checkPassword() {
+            if(isAuthenticated) return;
+            
+            const password = document.getElementById('passwordInput').value;
+            const errorElement = document.getElementById('passwordError');
+            
+            if (VALID_PASSWORDS.includes(password)) {
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                isAuthenticated = true;
+                showBanner();
+                checkServer();
+            } else {
+                attempts++;
+                errorElement.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                if (attempts >= MAX_ATTEMPTS) {
+                    alert('Too many failed attempts. Reloading page...');
+                    location.reload();
+                }
+            }
+        }
+
+        // Original Browser Functions
         const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
         let progressInterval;
 
-        // Cookie functions
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -183,7 +266,6 @@
                 ?.split('=')[1];
         }
 
-        // Banner control
         function showBanner() {
             if(!getCookie('bannerDismissed')) {
                 document.getElementById('welcomeBanner').style.display = 'block';
@@ -195,8 +277,9 @@
             document.getElementById('welcomeBanner').style.display = 'none';
         }
 
-        // Fullscreen functions
         function toggleFullscreen() {
+            if(!isAuthenticated) return;
+            
             const frame = document.getElementById('contentFrame');
             const btn = document.getElementById('fullscreenBtn');
             
@@ -215,12 +298,13 @@
             }
         }
 
-        // Existing proxy functions
         function updateProgress(percent) {
             document.getElementById('progress').style.width = `${percent}%`;
         }
 
         async function checkServer() {
+            if(!isAuthenticated) return;
+            
             try {
                 const response = await fetch(`${PROXY_SERVER}/ping`);
                 const statusDot = document.getElementById('statusDot');
@@ -237,6 +321,8 @@
         }
 
         async function loadUrl() {
+            if(!isAuthenticated) return;
+            
             const urlInput = document.getElementById('urlInput');
             const loading = document.getElementById('loading');
             const frame = document.getElementById('contentFrame');
@@ -279,8 +365,10 @@
             }
         }
 
-        // Event listeners
+        // Event Listeners
         document.addEventListener('fullscreenchange', () => {
+            if(!isAuthenticated) return;
+            
             const btn = document.getElementById('fullscreenBtn');
             if(!document.fullscreenElement) {
                 btn.textContent = 'Enter Fullscreen';
@@ -289,13 +377,16 @@
         });
 
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') loadUrl();
+            if(e.key === 'Enter' && isAuthenticated) loadUrl();
         });
 
-        // Initial setup
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') checkPassword();
+        });
+
+        // Initial Setup
         window.addEventListener('load', () => {
-            showBanner();
-            checkServer();
+            document.getElementById('passwordModal').style.display = 'flex';
         });
     </script>
 </body>
