@@ -1,28 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Pi Proxy Browser</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Pi Proxy</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' blob: data:;">
     <style>
-        body { margin: 20px; font-family: Arial; }
+        body { margin: 20px; font-family: Arial, sans-serif; }
         .container { max-width: 800px; margin: 0 auto; }
-        input[type="text"] { width: 70%; padding: 8px; }
-        button { padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-        iframe { width: 100%; height: 80vh; border: 1px solid #ddd; margin-top: 10px; }
-        .loading { 
+        .header { margin-bottom: 20px; }
+        input[type="text"] { 
+            width: 70%; 
+            padding: 12px;
+            border: 2px solid #4CAF50;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+        button { 
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #45a049; }
+        iframe { 
+            width: 100%; 
+            height: 80vh; 
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .loading {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
         .progress-bar {
-            width: 200px;
-            height: 4px;
-            background: #ddd;
-            margin: 10px auto;
+            width: 300px;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin: 20px auto;
+            overflow: hidden;
         }
         .progress {
             width: 0%;
@@ -30,24 +59,37 @@
             background: #4CAF50;
             transition: width 0.3s ease;
         }
+        .status-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <input type="text" id="urlInput" placeholder="Enter URL (e.g., example.com)">
-        <button onclick="loadUrl()">GO</button>
+        <div class="header">
+            <button onclick="checkServer()">Server Status</button>
+            <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
+        </div>
+        <input type="text" id="urlInput" placeholder="Enter website URL (e.g., crazygames.com)">
+        <button onclick="loadUrl()">Browse</button>
         <div class="loading" id="loading">
             <div class="progress-bar">
                 <div class="progress" id="progress"></div>
             </div>
-            <div>Loading...</div>
+            <div style="margin-top: 15px; color: #666;">Loading content...</div>
         </div>
         <iframe id="contentFrame"></iframe>
     </div>
 
     <script>
         const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
-        
+        let progressInterval;
+
         function updateProgress(percent) {
             document.getElementById('progress').style.width = `${percent}%`;
         }
@@ -55,44 +97,83 @@
         async function checkServer() {
             try {
                 const response = await fetch(`${PROXY_SERVER}/ping`);
-                alert(response.ok ? 'Server is online! 🟢' : 'Server error 🔴');
+                const statusDot = document.getElementById('statusDot');
+                if(response.ok) {
+                    alert('✅ Server is online and ready!');
+                    statusDot.style.background = '#4CAF50';
+                } else {
+                    throw new Error();
+                }
             } catch {
-                alert('Server unreachable 🔴');
+                alert('❌ Server connection failed!');
+                document.getElementById('statusDot').style.background = '#f44336';
             }
         }
 
-        function loadUrl() {
-            const url = document.getElementById('urlInput').value.trim();
-            if(!url) return alert('Please enter a URL');
-            
-            const frame = document.getElementById('contentFrame');
+        function handleNavigation(event) {
+            event.preventDefault();
+            const newUrl = event.target.href || event.target.action;
+            document.getElementById('urlInput').value = newUrl;
+            loadUrl();
+        }
+
+        async function loadUrl() {
+            const urlInput = document.getElementById('urlInput');
             const loading = document.getElementById('loading');
+            const frame = document.getElementById('contentFrame');
             
+            let url = urlInput.value.trim();
+            if(!url) return alert('Please enter a website URL');
+            
+            if(!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = `https://${url}`;
+            }
+
             loading.style.display = 'block';
             updateProgress(0);
             
-            // Simple progress simulation
             let progress = 0;
-            const interval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 10, 90);
+            progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 8, 95);
                 updateProgress(progress);
             }, 100);
 
-            frame.onload = () => {
-                clearInterval(interval);
-                updateProgress(100);
-                setTimeout(() => {
-                    loading.style.display = 'none';
-                }, 300);
-            };
+            try {
+                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
+                
+                frame.onload = () => {
+                    clearInterval(progressInterval);
+                    updateProgress(100);
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                    }, 300);
 
-            frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
+                    try {
+                        const doc = frame.contentDocument || frame.contentWindow.document;
+                        doc.querySelectorAll('a, form').forEach(element => {
+                            element.addEventListener(element.tagName === 'A' ? 'click' : 'submit', handleNavigation);
+                        });
+                    } catch {}
+                };
+
+                frame.onerror = () => {
+                    throw new Error('Failed to load page content');
+                };
+
+            } catch(error) {
+                clearInterval(progressInterval);
+                loading.style.display = 'none';
+                alert(`Error: ${error.message}`);
+            }
         }
 
-        // Add check server button
-        document.body.insertAdjacentHTML('afterbegin', 
-            `<button style="margin-bottom: 10px" onclick="checkServer()">Check Server Status</button>`
-        );
+        // Enter key support
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') loadUrl();
+        });
+
+        // Initial status check
+        checkServer();
     </script>
 </body>
 </html>
