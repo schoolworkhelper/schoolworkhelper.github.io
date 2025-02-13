@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,7 +44,6 @@
         .main-content {
             display: none;
         }
-
         /* Original Styles */
         body { margin: 0; font-family: Arial, sans-serif; }
         .container { padding: 15px; }
@@ -80,16 +80,7 @@
             background: #2196F3;
         }
         button.secondary:hover {
-            background: #1976D2;
-        }
-        iframe { 
-            width: 100vw;
-            height: 100vh;
-            border: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
+            background: #1a237e;
         }
         .iframe-visible {
             z-index: 1000 !important;
@@ -183,7 +174,6 @@
             </div>
         </div>
     </div>
-
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="container">
@@ -206,19 +196,17 @@
             </div>
             <iframe id="contentFrame"></iframe>
         </div>
-
-        <div class="welcome-banner" id="welcomeBanner">
-            <div class="banner-content">
-                <h3 class="banner-header">Welcome SchoolWebBrowser!</h3>
-                <p class="banner-text">
-                    There will be a "ngrok" warning the first time you use (comes up once only).
-                    Please click "Proceed" or "Continue".
-                </p>
-                <button class="banner-close" onclick="dismissBanner()">Got It!</button>
-            </div>
+    </div>
+    <div class="welcome-banner" id="welcomeBanner">
+        <div class="banner-content">
+            <h3 class="banner-header">Welcome SchoolWebBrowser!</h3>
+            <p class="banner-text">
+                There will be a "ngrok" warning the first time you use (comes up once only).
+                Please click "Proceed" or "Continue".
+            </p>
+            <button class="banner-close" onclick="dismissBanner()">Got It!</button>
         </div>
     </div>
-
     <script>
         // Password Configuration
         const VALID_PASSWORDS = ['eac', 'udfrfr', 'be', 'test'];
@@ -228,10 +216,8 @@
 
         function checkPassword() {
             if(isAuthenticated) return;
-            
             const password = document.getElementById('passwordInput').value;
             const errorElement = document.getElementById('passwordError');
-            
             if (VALID_PASSWORDS.includes(password)) {
                 document.getElementById('passwordModal').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
@@ -256,14 +242,18 @@
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+            document.cookie = `${name}=${value};expires=${date.toUTCString()}`;
         }
 
         function getCookie(name) {
-            return document.cookie
-                .split('; ')
-                .find(row => row.startsWith(`${name}=`))
-                ?.split('=')[1];
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [key, value] = cookie.trim().split('=');
+                if (key === name) {
+                    return value;
+                }
+            }
+            return null;
         }
 
         function showBanner() {
@@ -279,115 +269,8 @@
 
         function toggleFullscreen() {
             if(!isAuthenticated) return;
-            
             const frame = document.getElementById('contentFrame');
             const btn = document.getElementById('fullscreenBtn');
-            
             if(!document.fullscreenElement) {
                 frame.classList.add('iframe-visible');
-                if(frame.requestFullscreen) {
-                    frame.requestFullscreen().catch(err => {
-                        alert('Fullscreen failed: ' + err.message);
-                    });
-                }
-                btn.textContent = 'Exit Fullscreen';
-            } else {
-                document.exitFullscreen();
-                frame.classList.remove('iframe-visible');
-                btn.textContent = 'Enter Fullscreen';
-            }
-        }
-
-        function updateProgress(percent) {
-            document.getElementById('progress').style.width = `${percent}%`;
-        }
-
-        async function checkServer() {
-            if(!isAuthenticated) return;
-            
-            try {
-                const response = await fetch(`${PROXY_SERVER}/ping`);
-                const statusDot = document.getElementById('statusDot');
-                if(response.ok) {
-                    alert('✅ Server is online and ready!');
-                    statusDot.style.background = '#4CAF50';
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                alert('❌ Server connection failed!');
-                document.getElementById('statusDot').style.background = '#f44336';
-            }
-        }
-
-        async function loadUrl() {
-            if(!isAuthenticated) return;
-            
-            const urlInput = document.getElementById('urlInput');
-            const loading = document.getElementById('loading');
-            const frame = document.getElementById('contentFrame');
-            
-            let url = urlInput.value.trim();
-            if(!url) return alert('Please enter a website URL');
-            
-            if(!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = `https://${url}`;
-            }
-
-            loading.style.display = 'block';
-            updateProgress(0);
-            
-            let progress = 0;
-            progressInterval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 8, 95);
-                updateProgress(progress);
-            }, 100);
-
-            try {
-                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
-                
-                frame.onload = () => {
-                    clearInterval(progressInterval);
-                    updateProgress(100);
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                    }, 300);
-                };
-
-                frame.onerror = () => {
-                    throw new Error('Failed to load page content');
-                };
-
-            } catch(error) {
-                clearInterval(progressInterval);
-                loading.style.display = 'none';
-                alert(`Error: ${error.message}`);
-            }
-        }
-
-        // Event Listeners
-        document.addEventListener('fullscreenchange', () => {
-            if(!isAuthenticated) return;
-            
-            const btn = document.getElementById('fullscreenBtn');
-            if(!document.fullscreenElement) {
-                btn.textContent = 'Enter Fullscreen';
-                document.getElementById('contentFrame').classList.remove('iframe-visible');
-            }
-        });
-
-        document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter' && isAuthenticated) loadUrl();
-        });
-
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') checkPassword();
-        });
-
-        // Initial Setup
-        window.addEventListener('load', () => {
-            document.getElementById('passwordModal').style.display = 'flex';
-        });
-    </script>
-</body>
-</html>
+                }    }
