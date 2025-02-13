@@ -43,7 +43,8 @@
         .main-content {
             display: none;
         }
-        /* Original Styles */
+
+        /* Original Styles Remain Unchanged */
         body { margin: 0; font-family: Arial, sans-serif; }
         .container { padding: 15px; }
         .header { 
@@ -81,8 +82,8 @@
         button.secondary:hover {
             background: #1976D2;
         }
-        iframe {
-            width: 100%;
+        iframe { 
+            width: 100vw;
             height: 100vh;
             border: none;
             position: fixed;
@@ -177,9 +178,6 @@
             <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">
             <button onclick="checkPassword()">Unlock Browser</button>
             <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
-            <div style="margin-top: 20px; color: #666; font-size: 0.9em;">
-                Contact Owner for Password
-            </div>
         </div>
     </div>
 
@@ -193,9 +191,7 @@
                 <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
             </div>
             <div class="button-group">
-                <button class="secondary" onclick="toggleFullscreen()" id="fu
-1000
-llscreenBtn">
+                <button class="secondary" onclick="toggleFullscreen()" id="fullscreenBtn">
                     Enter Fullscreen
                 </button>
             </div>
@@ -207,10 +203,10 @@ llscreenBtn">
             </div>
             <iframe id="contentFrame"></iframe>
         </div>
-        
+
         <div class="welcome-banner" id="welcomeBanner">
             <div class="banner-content">
-                <h3 class="banner-header">Welcome SchoolWebBrowser!</h3>
+                <h3 class="banner-header">Welcome to Pi Web Browser!</h3>
                 <p class="banner-text">
                     There will be a "ngrok" warning the first time you use (comes up once only).
                     Please click "Proceed" or "Continue".
@@ -222,10 +218,25 @@ llscreenBtn">
 
     <script>
         // Password Configuration
-        const VALID_PASSWORDS = ['eac', 'udfrfr', 'be', 'test'];
+        let validPasswords = [];
         let attempts = 0;
         const MAX_ATTEMPTS = 5;
         let isAuthenticated = false;
+
+        async function loadPasswords() {
+            try {
+                const response = await fetch('pass.txt');
+                if (!response.ok) throw new Error('Failed to load passwords');
+                const text = await response.text();
+                validPasswords = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+            } catch (error) {
+                console.error('Error loading passwords:', error);
+                alert('Error loading password list. Please try again later.');
+                validPasswords = [];
+            }
+        }
 
         function checkPassword() {
             if(isAuthenticated) return;
@@ -233,7 +244,7 @@ llscreenBtn">
             const password = document.getElementById('passwordInput').value;
             const errorElement = document.getElementById('passwordError');
 
-            if (VALID_PASSWORDS.includes(password)) {
+            if (validPasswords.includes(password)) {
                 document.getElementById('passwordModal').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 isAuthenticated = true;
@@ -250,7 +261,10 @@ llscreenBtn">
             }
         }
 
-        // Cookie Functions
+        // Original Browser Functions
+        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
+        let progressInterval;
+
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -264,7 +278,6 @@ llscreenBtn">
                 ?.split('=')[1];
         }
 
-        // Banner Functions
         function showBanner() {
             if(!getCookie('bannerDismissed')) {
                 document.getElementById('welcomeBanner').style.display = 'block';
@@ -276,16 +289,12 @@ llscreenBtn">
             document.getElementById('welcomeBanner').style.display = 'none';
         }
 
-        // Browser Functions
-        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
-        let progressInterval;
-
         function toggleFullscreen() {
             if(!isAuthenticated) return;
             
             const frame = document.getElementById('contentFrame');
             const btn = document.getElementById('fullscreenBtn');
-
+            
             if(!document.fullscreenElement) {
                 frame.classList.add('iframe-visible');
                 if(frame.requestFullscreen) {
@@ -306,9 +315,7 @@ llscreenBtn">
         }
 
         async function checkServer() {
-  
-f74
-          if(!isAuthenticated) return;
+            if(!isAuthenticated) return;
             
             try {
                 const response = await fetch(`${PROXY_SERVER}/ping`);
@@ -331,7 +338,7 @@ f74
             const urlInput = document.getElementById('urlInput');
             const loading = document.getElementById('loading');
             const frame = document.getElementById('contentFrame');
-
+            
             let url = urlInput.value.trim();
             if(!url) return alert('Please enter a website URL');
             
@@ -349,8 +356,7 @@ f74
             }, 100);
 
             try {
-                const encodedUrl = btoa(url);
-                frame.src = `${PROXY_SERVER}/?url=${encodedUrl}`;
+                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
                 
                 frame.onload = () => {
                     clearInterval(progressInterval);
@@ -363,6 +369,7 @@ f74
                 frame.onerror = () => {
                     throw new Error('Failed to load page content');
                 };
+
             } catch(error) {
                 clearInterval(progressInterval);
                 loading.style.display = 'none';
@@ -390,7 +397,8 @@ f74
         });
 
         // Initial Setup
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+            await loadPasswords();
             document.getElementById('passwordModal').style.display = 'flex';
         });
     </script>
