@@ -4,7 +4,6 @@
     <title>LanguagesOnline</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' blob: data:;">
     <style>
         /* Password Modal Styles */
         .password-modal {
@@ -44,7 +43,7 @@
             display: none;
         }
 
-        /* Original Styles Remain Unchanged */
+        /* Main Interface Styles */
         body { margin: 0; font-family: Arial, sans-serif; }
         .container { padding: 15px; }
         .header { 
@@ -169,6 +168,7 @@
             transform: scale(1.05);
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
     <!-- Password Gate -->
@@ -181,7 +181,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Interface -->
     <div class="main-content" id="mainContent">
         <div class="container">
             <div class="header">
@@ -204,6 +204,7 @@
             <iframe id="contentFrame"></iframe>
         </div>
 
+        <!-- Welcome Banner -->
         <div class="welcome-banner" id="welcomeBanner">
             <div class="banner-content">
                 <h3 class="banner-header">Welcome to SchoolWorkHelper+</h3>
@@ -217,40 +218,43 @@
     </div>
 
     <script>
-        // Password Configuration
-        let validPasswords = [];
+        // Security Configuration (Match proxy.py values)
+        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
+        const AES_KEY = CryptoJS.enc.Utf8.parse('32byte-long-secret-key-keep-it-safe!');
+        const AES_IV = CryptoJS.enc.Utf8.parse('16byte-secret-iv');
+        
+        // Application State
         let attempts = 0;
         const MAX_ATTEMPTS = 5;
         let isAuthenticated = false;
+        let progressInterval;
 
-        async function loadPasswords() {
-            try {
-                const response = await fetch('pass.txt');
-                if (!response.ok) throw new Error('Failed to load passwords');
-                const text = await response.text();
-                validPasswords = text.split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0);
-            } catch (error) {
-                console.error('Error loading passwords:', error);
-                alert('Error loading password list. Please try again later.');
-                validPasswords = [];
-            }
-        }
-
-        function checkPassword() {
-            if(isAuthenticated) return;
-            
+        // Password Handling
+        async function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             const errorElement = document.getElementById('passwordError');
 
-            if (validPasswords.includes(password)) {
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                isAuthenticated = true;
-                showBanner();
-                checkServer();
-            } else {
+            try {
+                const response = await fetch(`${PROXY_SERVER}/check_password`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password: password})
+                });
+
+                if (response.ok) {
+                    document.getElementById('passwordModal').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    isAuthenticated = true;
+                    showBanner();
+                    checkServer();
+                } else {
+                    handleFailedAttempt();
+                }
+            } catch (error) {
+                handleFailedAttempt();
+            }
+
+            function handleFailedAttempt() {
                 attempts++;
                 errorElement.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
@@ -261,10 +265,71 @@
             }
         }
 
-        // Original Browser Functions
-        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
-        let progressInterval;
+        // URL Encryption
+        function encryptUrl(url) {
+            const encrypted = CryptoJS.AES.encrypt(url, AES_KEY, {
+                iv: AES_IV,
+                padding: CryptoJS.pad.Pkcs7,
+                mode: CryptoJS.mode.CBC
+            });
+            return encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+        }
 
+        // Core Functions
+        function updateProgress(percent) {
+            document.getElementById('progress').style.width = `${percent}%`;
+        }
+
+        async function loadUrl() {
+            if(!isAuthenticated) return;
+            
+            const urlInput = document.getElementById('urlInput');
+            const loading = document.getElementById('loading');
+            const frame = document.getElementById('contentFrame');
+            
+            let url = urlInput.value.trim();
+            if(!url) return alert('Please enter a website URL');
+            
+            if(!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = `https://${url}`;
+            }
+
+            const encryptedUrl = encryptUrl(url);
+            loading.style.display = 'block';
+            updateProgress(0);
+            
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 8, 95);
+                updateProgress(progress);
+            }, 100);
+
+            try {
+                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(encryptedUrl)}`;
+                
+                frame.onload = () => {
+                    clearInterval(progressInterval);
+                    updateProgress(100);
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                    }, 300);
+                };
+
+                frame.onerror = () => {
+                    throw new Error('Failed to load page content');
+                };
+
+            } catch(error) {
+                clearInterval(progressInterval);
+                loading.style.display = 'none';
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // UI Functions
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -290,8 +355,6 @@
         }
 
         function toggleFullscreen() {
-            if(!isAuthenticated) return;
-            
             const frame = document.getElementById('contentFrame');
             const btn = document.getElementById('fullscreenBtn');
             
@@ -310,13 +373,7 @@
             }
         }
 
-        function updateProgress(percent) {
-            document.getElementById('progress').style.width = `${percent}%`;
-        }
-
         async function checkServer() {
-            if(!isAuthenticated) return;
-            
             try {
                 const response = await fetch(`${PROXY_SERVER}/ping`);
                 const statusDot = document.getElementById('statusDot');
@@ -332,55 +389,8 @@
             }
         }
 
-        async function loadUrl() {
-            if(!isAuthenticated) return;
-            
-            const urlInput = document.getElementById('urlInput');
-            const loading = document.getElementById('loading');
-            const frame = document.getElementById('contentFrame');
-            
-            let url = urlInput.value.trim();
-            if(!url) return alert('Please enter a website URL');
-            
-            if(!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = `https://${url}`;
-            }
-
-            loading.style.display = 'block';
-            updateProgress(0);
-            
-            let progress = 0;
-            progressInterval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 8, 95);
-                updateProgress(progress);
-            }, 100);
-
-            try {
-                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(url)}`;
-                
-                frame.onload = () => {
-                    clearInterval(progressInterval);
-                    updateProgress(100);
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                    }, 300);
-                };
-
-                frame.onerror = () => {
-                    throw new Error('Failed to load page content');
-                };
-
-            } catch(error) {
-                clearInterval(progressInterval);
-                loading.style.display = 'none';
-                alert(`Error: ${error.message}`);
-            }
-        }
-
         // Event Listeners
         document.addEventListener('fullscreenchange', () => {
-            if(!isAuthenticated) return;
-            
             const btn = document.getElementById('fullscreenBtn');
             if(!document.fullscreenElement) {
                 btn.textContent = 'Enter Fullscreen';
@@ -389,16 +399,15 @@
         });
 
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter' && isAuthenticated) loadUrl();
+            if(e.key === 'Enter') loadUrl();
         });
 
         document.getElementById('passwordInput').addEventListener('keypress', (e) => {
             if(e.key === 'Enter') checkPassword();
         });
 
-        // Initial Setup
-        window.addEventListener('load', async () => {
-            await loadPasswords();
+        // Initialization
+        window.addEventListener('load', () => {
             document.getElementById('passwordModal').style.display = 'flex';
         });
     </script>
