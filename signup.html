@@ -1,414 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LanguagesOnline</title>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Secure Browser</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' secure-proxy-gh.herokuapp.com;">
     <style>
-        /* Password Modal Styles */
-        .password-modal {
+        /* ==== Full Security UI Styles ==== */
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --error: #e74c3c;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #ecf0f1;
+        }
+
+        .auth-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-        }
-        .password-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
-        .password-input {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #4CAF50;
-            border-radius: 25px;
-            font-size: 16px;
-        }
-        .password-error {
-            color: #ff4444;
-            margin-top: 10px;
-            display: none;
-        }
-        .main-content {
-            display: none;
+            z-index: 1000;
         }
 
-        /* Main Interface Styles */
-        body { margin: 0; font-family: Arial, sans-serif; }
-        .container { padding: 15px; }
-        .header { 
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
+        .auth-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
         }
-        input[type="text"] { 
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #4CAF50;
-            border-radius: 25px;
-            font-size: 16px;
+
+        .auth-input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 2px solid var(--primary);
+            border-radius: 2rem;
+            font-size: 1rem;
         }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        button { 
-            padding: 12px 25px;
-            background: #4CAF50;
+
+        .auth-button {
+            background: var(--primary);
             color: white;
+            padding: 1rem 2rem;
             border: none;
-            border-radius: 25px;
+            border-radius: 2rem;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
+            font-size: 1rem;
+            transition: 0.3s;
         }
-        button:hover { background: #45a049; }
-        button.secondary {
-            background: #2196F3;
+
+        .auth-button:hover {
+            opacity: 0.9;
         }
-        button.secondary:hover {
-            background: #1976D2;
-        }
-        iframe { 
-            width: 100vw;
-            height: 100vh;
-            border: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-        .iframe-visible {
-            z-index: 1000 !important;
-        }
-        .loading {
+
+        .browser-ui {
             display: none;
+            padding: 1rem;
+        }
+
+        .url-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #urlInput {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 2rem;
+        }
+
+        .loading-overlay {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            z-index: 2000;
-        }
-        .progress-bar {
-            width: 300px;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
-            margin: 20px auto;
-            overflow: hidden;
-        }
-        .progress {
-            width: 0%;
-            height: 100%;
-            background: #4CAF50;
-            transition: width 0.3s ease;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-        }
-        .welcome-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            max-width: 600px;
+            background: rgba(255,255,255,0.9);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 0 2rem rgba(0,0,0,0.1);
             display: none;
-            z-index: 3000;
         }
-        .banner-content {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .banner-header {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 1.2em;
-        }
-        .banner-text {
-            margin: 0;
-            color: #34495e;
-            line-height: 1.5;
-        }
-        .banner-close {
-            align-self: flex-end;
-            padding: 8px 20px;
-            background: #4CAF50;
-            color: white;
+
+        #contentFrame {
+            width: 100%;
+            height: calc(100vh - 100px);
             border: none;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        .banner-close:hover {
-            background: #45a049;
-            transform: scale(1.05);
+            background: white;
+            border-radius: 1rem;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
-    <!-- Password Gate -->
-    <div class="password-modal" id="passwordModal">
-        <div class="password-box">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">Enter Access Password</h2>
-            <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">
-            <button onclick="checkPassword()">Unlock Browser</button>
-            <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
+    <!-- Authentication Interface -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-box">
+            <h2>Secure School Browser</h2>
+            <input type="password" class="auth-input" id="passwordInput" placeholder="Enter access code">
+            <button class="auth-button" onclick="authenticate()">Unlock</button>
+            <div id="authError" style="color: var(--error); margin-top: 1rem; display: none;">
+                Invalid code. Try again.
+            </div>
         </div>
     </div>
 
-    <!-- Main Interface -->
-    <div class="main-content" id="mainContent">
-        <div class="container">
-            <div class="header">
-                <input type="text" id="urlInput" placeholder="Enter website URL">
-                <button onclick="loadUrl()">Browse</button>
-                <button class="secondary" onclick="checkServer()">Status</button>
-                <div id="statusDot" class="status-indicator" style="background: #ccc"></div>
-            </div>
-            <div class="button-group">
-                <button class="secondary" onclick="toggleFullscreen()" id="fullscreenBtn">
-                    Enter Fullscreen
-                </button>
-            </div>
-            <div class="loading" id="loading">
-                <div class="progress-bar">
-                    <div class="progress" id="progress"></div>
-                </div>
-                <div style="margin-top: 15px; color: #666;">Loading content...</div>
-            </div>
-            <iframe id="contentFrame"></iframe>
+    <!-- Browser Interface -->
+    <div class="browser-ui" id="browserUI">
+        <div class="url-bar">
+            <input type="text" id="urlInput" placeholder="https://example.com">
+            <button class="auth-button" onclick="loadUrl()">Go</button>
         </div>
-
-        <!-- Welcome Banner -->
-        <div class="welcome-banner" id="welcomeBanner">
-            <div class="banner-content">
-                <h3 class="banner-header">Welcome to SchoolWorkHelper+</h3>
-                <p class="banner-text">
-                    There will be a "ngrok" warning the first time you use (comes up once only).
-                    Please click "Visit Site". Thank you for using School Work Helper!
-                </p>
-                <button class="banner-close" onclick="dismissBanner()">Got It!</button>
-            </div>
+        <div class="loading-overlay" id="loading">
+            <div>Loading secure content...</div>
         </div>
+        <iframe id="contentFrame"></iframe>
     </div>
 
     <script>
-        // Security Configuration (Match proxy.py values)
-        const PROXY_SERVER = 'https://garfish-capital-reindeer.ngrok-free.app';
-        const AES_KEY = CryptoJS.enc.Utf8.parse('32byte-long-secret-key-keep-it-safe!');
-        const AES_IV = CryptoJS.enc.Utf8.parse('16byte-secret-iv');
-        
-        // Application State
+        // ==== Security Configuration ====
+        const PROXY_SERVER = 'https://secure-proxy-gh.herokuapp.com';
+        const AES_CONFIG = {
+            key: CryptoJS.enc.Base64.parse('k5z6HqJ9snR4wL3vE2tY1uA8mX7fB0gKpOcNlTdIiFjChQ4='),
+            iv: CryptoJS.enc.Base64.parse('Wv9y/Zr2s8V4q3tL'),
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        };
+
+        // ==== State Management ====
+        let authToken = null;
         let attempts = 0;
-        const MAX_ATTEMPTS = 5;
-        let isAuthenticated = false;
-        let progressInterval;
 
-        // Password Handling
-        async function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            const errorElement = document.getElementById('passwordError');
-
-            try {
-                const response = await fetch(`${PROXY_SERVER}/check_password`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({password: password})
-                });
-
-                if (response.ok) {
-                    document.getElementById('passwordModal').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
-                    isAuthenticated = true;
-                    showBanner();
-                    checkServer();
-                } else {
-                    handleFailedAttempt();
-                }
-            } catch (error) {
-                handleFailedAttempt();
-            }
-
-            function handleFailedAttempt() {
-                attempts++;
-                errorElement.style.display = 'block';
-                document.getElementById('passwordInput').value = '';
-                if (attempts >= MAX_ATTEMPTS) {
-                    alert('Too many failed attempts. Reloading page...');
-                    location.reload();
-                }
-            }
-        }
-
-        // URL Encryption
+        // ==== Core Functions ====
         function encryptUrl(url) {
-            const encrypted = CryptoJS.AES.encrypt(url, AES_KEY, {
-                iv: AES_IV,
-                padding: CryptoJS.pad.Pkcs7,
-                mode: CryptoJS.mode.CBC
-            });
+            const encrypted = CryptoJS.AES.encrypt(
+                `${url}::${Date.now()}`, 
+                AES_CONFIG.key, 
+                AES_CONFIG
+            );
             return encrypted.ciphertext.toString(CryptoJS.enc.Base64)
                 .replace(/\+/g, '-')
                 .replace(/\//g, '_')
                 .replace(/=+$/, '');
         }
 
-        // Core Functions
-        function updateProgress(percent) {
-            document.getElementById('progress').style.width = `${percent}%`;
+        async function authenticate() {
+            const password = document.getElementById('passwordInput').value;
+            const errorElement = document.getElementById('authError');
+
+            try {
+                const response = await fetch(`${PROXY_SERVER}/auth`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password})
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('browserUI').style.display = 'block';
+                } else {
+                    throw new Error('Authentication failed');
+                }
+            } catch (error) {
+                if (++attempts >= 5) window.location.reload();
+                errorElement.style.display = 'block';
+            }
         }
 
         async function loadUrl() {
-            if(!isAuthenticated) return;
-            
             const urlInput = document.getElementById('urlInput');
             const loading = document.getElementById('loading');
             const frame = document.getElementById('contentFrame');
             
             let url = urlInput.value.trim();
-            if(!url) return alert('Please enter a website URL');
+            if (!url) return;
             
-            if(!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = `https://${url}`;
-            }
-
-            const encryptedUrl = encryptUrl(url);
-            loading.style.display = 'block';
-            updateProgress(0);
+            if (!url.startsWith('http')) url = `https://${url}`;
             
-            let progress = 0;
-            progressInterval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 8, 95);
-                updateProgress(progress);
-            }, 100);
-
             try {
-                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(encryptedUrl)}`;
+                loading.style.display = 'block';
+                const encrypted = encryptUrl(url);
                 
-                frame.onload = () => {
-                    clearInterval(progressInterval);
-                    updateProgress(100);
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                    }, 300);
-                };
-
-                frame.onerror = () => {
-                    throw new Error('Failed to load page content');
-                };
-
-            } catch(error) {
-                clearInterval(progressInterval);
+                frame.src = `${PROXY_SERVER}/proxy?url=${encodeURIComponent(encrypted)}`;
+                frame.onload = () => loading.style.display = 'none';
+                
+            } catch (error) {
                 loading.style.display = 'none';
-                alert(`Error: ${error.message}`);
+                alert('Error loading page');
             }
         }
 
-        // UI Functions
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
-        }
-
-        function getCookie(name) {
-            return document.cookie
-                .split('; ')
-                .find(row => row.startsWith(`${name}=`))
-                ?.split('=')[1];
-        }
-
-        function showBanner() {
-            if(!getCookie('bannerDismissed')) {
-                document.getElementById('welcomeBanner').style.display = 'block';
-            }
-        }
-
-        function dismissBanner() {
-            setCookie('bannerDismissed', 'true', 365);
-            document.getElementById('welcomeBanner').style.display = 'none';
-        }
-
-        function toggleFullscreen() {
-            const frame = document.getElementById('contentFrame');
-            const btn = document.getElementById('fullscreenBtn');
-            
-            if(!document.fullscreenElement) {
-                frame.classList.add('iframe-visible');
-                if(frame.requestFullscreen) {
-                    frame.requestFullscreen().catch(err => {
-                        alert('Fullscreen failed: ' + err.message);
-                    });
-                }
-                btn.textContent = 'Exit Fullscreen';
-            } else {
-                document.exitFullscreen();
-                frame.classList.remove('iframe-visible');
-                btn.textContent = 'Enter Fullscreen';
-            }
-        }
-
-        async function checkServer() {
-            try {
-                const response = await fetch(`${PROXY_SERVER}/ping`);
-                const statusDot = document.getElementById('statusDot');
-                if(response.ok) {
-                    alert('✅ Server is online and ready!');
-                    statusDot.style.background = '#4CAF50';
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                alert('❌ Server connection failed!');
-                document.getElementById('statusDot').style.background = '#f44336';
-            }
-        }
-
-        // Event Listeners
-        document.addEventListener('fullscreenchange', () => {
-            const btn = document.getElementById('fullscreenBtn');
-            if(!document.fullscreenElement) {
-                btn.textContent = 'Enter Fullscreen';
-                document.getElementById('contentFrame').classList.remove('iframe-visible');
-            }
-        });
-
+        // ==== Event Listeners ====
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') loadUrl();
-        });
-
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') checkPassword();
-        });
-
-        // Initialization
-        window.addEventListener('load', () => {
-            document.getElementById('passwordModal').style.display = 'flex';
+            if (e.key === 'Enter') loadUrl();
         });
     </script>
 </body>
